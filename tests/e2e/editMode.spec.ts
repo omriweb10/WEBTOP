@@ -13,22 +13,19 @@ test.describe('hidden local edit mode', () => {
     await expect(page.getByRole('button', { name: /עריכת שעה/ })).toHaveCount(0);
     const title = page.getByRole('heading', { name: 'מ. שעות ושינויים' });
     for (let i = 0; i < 6; i += 1) await title.click({ delay: 10 });
-    await expect(page.getByRole('dialog', { name: 'מצב עריכה מקומי' })).toBeHidden();
+    await expect(page.getByRole('region', { name: 'מצב עריכה' })).toHaveCount(0);
   });
 
-  test('seven taps + wrong code is rejected; 581026 unlocks; exit removes the editor UI', async ({ page }) => {
+  test('the seventh tap opens edit mode at once, with no code prompt; exit removes the editor UI', async ({ page }) => {
     const errors = trackErrors(page);
     await openApp(page);
     const title = page.getByRole('heading', { name: 'מ. שעות ושינויים' });
     for (let i = 0; i < 7; i += 1) await title.click({ delay: 10 });
-    const dialog = page.getByRole('dialog', { name: 'מצב עריכה מקומי' });
-    await dialog.getByLabel('קוד').fill('123456');
-    await dialog.getByRole('button', { name: 'כניסה' }).click();
-    await expect(dialog.getByRole('alert')).toHaveText('הקוד שגוי');
-    await dialog.getByLabel('קוד').fill('581026');
-    await dialog.getByRole('button', { name: 'כניסה' }).click();
 
     const bar = page.getByRole('region', { name: 'מצב עריכה' });
+    await expect(bar).toBeVisible();
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expect(page.getByRole('textbox')).toHaveCount(0);
     await expect(bar).toContainText('במכשיר זה בלבד');
     await expect(page.getByRole('button', { name: /עריכת שעה 1/ })).toBeVisible();
     await bar.getByRole('button', { name: 'יציאה' }).click();

@@ -89,6 +89,31 @@ describe.skipIf(!stackAvailable)('authorization and isolation', () => {
     expect(moved.data).toEqual([{ day: 'tue', period_index: 0, preset_id: assigned }]);
   });
 
+  it('saves a student\'s edits only into their own timetable, and only while signed in', async () => {
+    const admin = await adminClient();
+    const [preset] = await presetIds();
+    const a = await createStudent();
+    const b = await createStudent();
+    await admin.rpc('admin_set_profile_presets', { p_profile_id: a.profileId, p_preset_ids: [preset] });
+    await admin.rpc('admin_save_user_lessons', { p_profile_id: b.profileId, p_changes: [{ day: 'sun', period_index: 0, preset_id: preset }] });
+    const { client } = await loginStudent(a.code);
+    const lessonsOf = async (id: string) => sql('select day, period_index from public.lessons where profile_id = $1 order by day, period_index', [id]);
+
+    // The target is always the caller's live session; naming another student changes nothing there.
+    await client.rpc('save_my_lessons', { p_profile_id: b.profileId, p_changes: [{ day: 'sun', period_index: 0, preset_id: null }] });
+    expect(await lessonsOf(b.profileId)).toEqual([{ day: 'sun', period_index: 0 }]);
+    expect((await client.rpc('save_my_lessons', { p_changes: [{ day: 'wed', period_index: 1, preset_id: preset }] })).error).toBeNull();
+    expect(await lessonsOf(a.profileId)).toEqual([{ day: 'wed', period_index: 1 }]);
+    expect(await lessonsOf(b.profileId)).toEqual([{ day: 'sun', period_index: 0 }]);
+
+    expect((await anonClient().rpc('save_my_lessons', { p_changes: [{ day: 'mon', period_index: 0, preset_id: preset }] })).error).not.toBeNull();
+    const [session] = await sql<{ id: string }>("select id from public.user_sessions where profile_id = $1 and status = 'active'", [a.profileId]);
+    await admin.rpc('admin_disconnect_session', { p_session_id: session?.id });
+    const afterDisconnect = await client.rpc('save_my_lessons', { p_changes: [{ day: 'mon', period_index: 0, preset_id: preset }] });
+    expect(afterDisconnect.error?.code).toBe('42501');
+    expect(await lessonsOf(a.profileId)).toEqual([{ day: 'wed', period_index: 1 }]);
+  });
+
   it('enforces avatar storage policies', async () => {
     const admin = await adminClient();
     const a = await createStudent();

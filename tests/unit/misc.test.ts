@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isEditCodeValid } from '../../src/features/admin/domain/editCode';
+import { editModeBlocker } from '../../src/features/admin/editCapabilities';
 import { EMPTY_TAP_SEQUENCE, registerTap } from '../../src/features/admin/domain/tapUnlock';
 import {
   eventsToIcsEvents,
@@ -37,10 +37,13 @@ describe('seven-tap unlock gesture', () => {
     expect(slow.sequence.count).toBe(1);
   });
 
-  it('accepts only the demonstration code', () => {
-    expect(isEditCodeValid('581026')).toBe(true);
-    expect(isEditCodeValid(' 581 026 ')).toBe(true);
-    expect(isEditCodeValid('000000')).toBe(false);
+  it('opens edit mode only for a confirmed, connected account in account mode', () => {
+    expect(editModeBlocker(false, 'signed-out', false)).toBeNull();
+    expect(editModeBlocker(true, 'signed-in', false)).toBeNull();
+    expect(editModeBlocker(true, 'signed-out', false)).toMatch(/להתחבר/);
+    expect(editModeBlocker(true, 'starting', false)).toMatch(/להתחבר/);
+    expect(editModeBlocker(true, 'unreachable', true)).toMatch(/להתחבר/);
+    expect(editModeBlocker(true, 'signed-in', true)).toMatch(/אין חיבור/);
   });
 });
 

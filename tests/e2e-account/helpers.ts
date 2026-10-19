@@ -27,14 +27,12 @@ export async function signInStudent(page: Page, code: string): Promise<void> {
   await expect(page.getByRole('heading', { name: 'מ. שעות ושינויים' })).toBeVisible({ timeout: 15_000 });
 }
 
-/** Opens the hidden edit mode with seven taps and the code. */
+/** Opens the hidden edit mode with seven taps (no code, no dialog). */
 export async function unlockEditMode(page: Page): Promise<void> {
   const title = page.getByRole('heading', { name: 'מ. שעות ושינויים' });
   for (let i = 0; i < 7; i += 1) await title.click({ delay: 10 });
-  const dialog = page.getByRole('dialog', { name: 'עריכת המערכת שלי' });
-  await dialog.getByLabel('קוד').fill('581026');
-  await dialog.getByRole('button', { name: 'כניסה' }).click();
   await expect(page.getByRole('region', { name: 'מצב עריכה' })).toBeVisible();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
 }
 
 /** Builds a solid-colour RGB PNG in memory (for avatar uploads). */

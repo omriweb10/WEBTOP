@@ -30,14 +30,11 @@ export async function openApp(page: Page, hash = '#/schedule/timetable', seed?: 
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 }
 
-/** Performs the hidden gesture (7 rapid taps on the title) and enters the demo code. */
-export async function unlockEditMode(page: Page, code = '581026'): Promise<void> {
+/** Performs the hidden gesture (7 rapid taps on the title), which opens edit mode at once. */
+export async function unlockEditMode(page: Page): Promise<void> {
   const title = page.getByRole('heading', { name: 'מ. שעות ושינויים' });
   for (let i = 0; i < 7; i += 1) await title.click({ delay: 10 });
-  const dialog = page.getByRole('dialog', { name: 'מצב עריכה מקומי' });
-  await expect(dialog).toBeVisible();
-  await dialog.getByLabel('קוד').fill(code);
-  await dialog.getByRole('button', { name: 'כניסה' }).click();
+  await expect(page.getByRole('region', { name: 'מצב עריכה' })).toBeVisible();
 }
 
 /** The on-screen day table (the print-only week table is excluded). */

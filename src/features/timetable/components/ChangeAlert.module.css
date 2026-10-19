@@ -1,0 +1,34 @@
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: calc(100% - 2 * var(--page-gutter));
+  margin: 10px var(--page-gutter);
+  padding: 10px 12px;
+  border: 1px solid rgb(130 177 242 / 0.4);
+  border-radius: 10px;
+  background: #18263b;
+  color: var(--color-text);
+  text-align: start;
+}
+
+.icon {
+  flex: none;
+  color: var(--color-accent);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  font-size: var(--font-size-md);
+  line-height: 1.4;
+}
+
+.titles {
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

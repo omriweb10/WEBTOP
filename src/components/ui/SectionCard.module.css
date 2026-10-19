@@ -1,0 +1,40 @@
+/* Measured on the notices tab: 41pt header, divider, 47pt empty-state row, 16pt between blocks. */
+.card {
+  background: var(--color-surface-section);
+  border-radius: 4px;
+}
+
+.card + .card {
+  margin-top: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 var(--page-gutter);
+  border-bottom: 1px solid #222833;
+}
+
+.title {
+  flex: 1;
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-text-secondary);
+}
+
+.body {
+  padding: 0 var(--page-gutter);
+}
+
+.empty {
+  margin: 0;
+  min-height: 47px;
+  display: flex;
+  align-items: center;
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: #e5e9ef;
+}

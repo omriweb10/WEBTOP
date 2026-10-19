@@ -1,0 +1,45 @@
+/* Measured: 58pt bar, 32pt circles, first/last circle flush with the 16pt gutters. */
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: none;
+  height: var(--day-bar-height);
+  padding: 0 calc(var(--page-gutter) - 6px);
+  background: var(--color-surface-raised);
+}
+
+.day {
+  display: grid;
+  place-items: center;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  touch-action: manipulation;
+}
+
+.circle {
+  display: grid;
+  place-items: center;
+  width: var(--day-circle);
+  height: var(--day-circle);
+  border-radius: 50%;
+  color: #dce0e8;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    background-color var(--duration-medium) var(--ease-standard),
+    color var(--duration-medium);
+}
+
+.selected .circle {
+  background: var(--color-day-active);
+  color: var(--color-on-day-active);
+}
+
+.day:active .circle {
+  background: rgb(69 171 160 / 0.35);
+}

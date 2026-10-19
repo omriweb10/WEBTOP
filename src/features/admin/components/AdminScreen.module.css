@@ -1,0 +1,55 @@
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding: 12px 0 32px;
+}
+
+.intro {
+  margin: 0 16px 16px;
+  font-size: var(--font-size-md);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.sectionBody {
+  padding: 12px 0;
+}
+
+.paragraph {
+  margin: 0 0 12px;
+  font-size: var(--font-size-md);
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+
+.buttonGrid {
+  display: grid;
+  gap: 8px;
+}
+
+.error {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgb(242 107 107 / 0.12);
+  color: var(--color-danger);
+  font-size: var(--font-size-md);
+  line-height: 1.5;
+}
+
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--touch-target);
+  font-size: var(--font-size-base);
+}
+
+.checkRow input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--color-accent);
+}

@@ -1,0 +1,11 @@
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hint {
+  margin: 0 0 12px;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}

@@ -1,0 +1,44 @@
+/* Measured: 55pt tall, menu icon centred 36pt from the right edge, actions 40pt apart. */
+.appbar {
+  display: flex;
+  align-items: center;
+  height: var(--appbar-height);
+  flex: none;
+  padding-inline: 16px;
+  padding-inline-start: calc(16px + var(--safe-right));
+  padding-inline-end: calc(16px + var(--safe-left));
+  background: var(--color-appbar);
+  color: var(--color-text-strong);
+}
+
+.menuButton {
+  width: 40px;
+  flex: none;
+}
+
+.title {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* The title doubles as the hidden edit-mode trigger: no text selection or zoom on taps. */
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  flex: none;
+  color: #d6e2f3;
+}
+
+.actions > button {
+  width: 40px;
+}

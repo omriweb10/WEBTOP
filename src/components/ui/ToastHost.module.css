@@ -1,0 +1,59 @@
+.host {
+  position: fixed;
+  inset-inline: 12px;
+  bottom: calc(var(--safe-bottom) + 84px);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 6px 6px 6px 14px;
+  padding-inline-start: 14px;
+  border-radius: 12px;
+  background: #2a3242;
+  border: 1px solid #3a4457;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.4);
+  font-size: var(--font-size-base);
+  pointer-events: auto;
+  animation: fade-in var(--duration-fast) var(--ease-standard);
+}
+
+.success {
+  border-color: rgb(79 192 141 / 0.45);
+}
+
+.error {
+  border-color: rgb(242 107 107 / 0.6);
+}
+
+.message {
+  flex: 1;
+}
+
+.action,
+.close {
+  min-width: var(--touch-target);
+  min-height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  font-weight: 700;
+}
+
+.action {
+  color: var(--color-accent);
+  padding: 0 10px;
+}
+
+.close {
+  color: var(--color-text-muted);
+  font-size: 22px;
+  line-height: 1;
+}

@@ -1,0 +1,41 @@
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding-bottom: 24px;
+}
+
+.filterNote {
+  margin: 8px var(--page-gutter) 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.addRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 8px var(--page-gutter) 0;
+}
+
+.empty {
+  margin-top: var(--panel-gap);
+  padding: 0 var(--page-gutter);
+  background: var(--color-surface-section);
+}
+
+.month {
+  margin-top: var(--panel-gap);
+  padding: 0 var(--page-gutter) 4px;
+  background: var(--color-surface-section);
+}
+
+.monthTitle {
+  margin: 0;
+  padding: 12px 0 6px;
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  color: var(--color-text-secondary);
+}

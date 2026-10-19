@@ -1,0 +1,65 @@
+/* Measured: 64pt panel; label 10pt at ~18pt; value 13pt at ~37pt; underline at ~54pt. */
+.panel {
+  flex: none;
+  height: var(--display-panel-height);
+  padding: 0 var(--page-gutter);
+  background: var(--color-surface);
+}
+
+.field {
+  position: relative;
+  height: 55px;
+  border-bottom: 1px solid var(--color-input-line);
+}
+
+.label {
+  position: absolute;
+  top: 13px;
+  inset-inline-start: 0;
+  font-size: var(--font-size-xs);
+  line-height: 1;
+  color: var(--color-text-muted);
+}
+
+.value {
+  position: absolute;
+  top: 28px;
+  inset-inline-start: 0;
+  inset-inline-end: 32px;
+  font-size: var(--font-size-md);
+  line-height: 18px;
+  color: #d7dde4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.placeholder {
+  position: absolute;
+  top: 28px;
+  inset-inline-start: 0;
+  font-size: var(--font-size-sm);
+  line-height: 18px;
+  color: var(--color-text-secondary);
+}
+
+.arrow {
+  position: absolute;
+  top: 26px;
+  inset-inline-end: -6px;
+  color: var(--color-text-muted);
+}
+
+.native {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  appearance: none;
+  cursor: pointer;
+}
+
+.field:focus-within {
+  border-bottom-color: var(--color-accent);
+}

@@ -1,0 +1,82 @@
+.calendar {
+  padding: 8px var(--page-gutter) 12px;
+  background: var(--color-surface);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* chevron_left points "forward" in RTL; flip it for the previous-month button. */
+.prev svg {
+  transform: scaleX(-1);
+}
+
+.month {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: 700;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.weekday {
+  padding: 6px 0;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--font-size-md);
+}
+
+.outside {
+  color: #545b68;
+}
+
+.today span:first-child {
+  color: var(--color-day-active);
+  font-weight: 700;
+}
+
+.selected {
+  background: #1d2e47;
+  outline: 1px solid var(--color-accent);
+}
+
+.dots {
+  display: flex;
+  gap: 2px;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
+.exam {
+  background: #f4490c;
+}
+
+.event {
+  background: var(--color-accent);
+}

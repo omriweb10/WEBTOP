@@ -87,7 +87,7 @@ npx supabase functions deploy admin-access-code
    ```
 
 Admins sign in at `https://<user>.github.io/WEBTOP/#/admin`. Student access codes never work
-there, and the hidden 7-tap edit code never grants admin access.
+there, and the hidden 7-tap edit gesture never grants admin access.
 
 ## 6. Build and deploy the site
 

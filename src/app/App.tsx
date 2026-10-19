@@ -4,7 +4,6 @@ import { ToastHost } from '../components/ui/ToastHost';
 import { Sidebar } from '../components/layout/Sidebar';
 import { accountMode } from '../config/backend';
 import { StartupScreen } from '../features/account/components/StartupScreen';
-import { EditCodeDialog } from '../features/admin/components/EditCodeDialog';
 import { PrintableWeek } from '../features/timetable/components/PrintableWeek';
 import { UpdateBanner } from '../features/settings/components/UpdateBanner';
 import { onStorageProblem } from '../services/storage/appStorage';
@@ -58,7 +57,6 @@ export function App() {
         </div>
         <div className={styles.safeBottom} aria-hidden="true" />
         <Sidebar />
-        <EditCodeDialog />
         <ConfirmHost />
         <UpdateBanner />
         <ToastHost />

@@ -158,3 +158,23 @@ test('edit mode arranges only assigned subjects, saves to the account and never 
   await page.goto('#/admin');
   await expect(page.getByRole('heading', { name: 'כניסת מנהל' })).toBeVisible();
 });
+
+test('the seven-tap gesture needs a connection to the server, and opens edit mode without any prompt', async ({ page }) => {
+  const { code } = await createStudent({ display_name: 'ללא רשת' });
+  await signInStudent(page, code);
+
+  // Lose the server: the next check marks the app offline and edit mode stays closed.
+  await page.route('http://127.0.0.1:54321/**', (route) => route.abort('internetdisconnected'));
+  await page.evaluate(() => window.dispatchEvent(new Event('online')));
+  await expect(page.getByText(/אין חיבור לשרת · מוצגים הנתונים/)).toBeVisible();
+  const title = page.getByRole('heading', { name: 'מ. שעות ושינויים' });
+  for (let i = 0; i < 7; i += 1) await title.click({ delay: 10 });
+  await expect(page.getByText(/אפשר יהיה לערוך כשהחיבור יחזור/)).toBeVisible();
+  await expect(page.getByRole('region', { name: 'מצב עריכה' })).toHaveCount(0);
+
+  // Back online: seven taps open it immediately.
+  await page.unroute('http://127.0.0.1:54321/**');
+  await page.evaluate(() => window.dispatchEvent(new Event('online')));
+  await expect(page.getByText(/אין חיבור לשרת · מוצגים הנתונים/)).toHaveCount(0);
+  await unlockEditMode(page);
+});

@@ -1,12 +1,14 @@
 import { useCallback, useRef } from 'react';
+import { accountMode } from '../../../config/backend';
 import { toast } from '../../../store/uiStore';
 import { EMPTY_TAP_SEQUENCE, registerTap, type TapSequence } from '../domain/tapUnlock';
+import { currentEditModeBlocker } from '../editCapabilities';
 import { useEditModeStore } from '../editModeStore';
 
 /**
- * Returns a tap handler for the screen title. Seven rapid taps open the code prompt
- * (or remind the user that edit mode is already on). Nothing is shown before that,
- * so normal viewing stays free of edit affordances.
+ * Returns a tap handler for the screen title. Seven rapid taps turn edit mode on at once
+ * (no code or confirmation). Nothing is shown before that, so normal viewing stays free
+ * of edit affordances.
  */
 export function useSevenTapUnlock(): () => void {
   const sequence = useRef<TapSequence>(EMPTY_TAP_SEQUENCE);
@@ -16,7 +18,21 @@ export function useSevenTapUnlock(): () => void {
     sequence.current = next;
     if (!triggered) return;
     const state = useEditModeStore.getState();
-    if (state.unlocked) toast('מצב העריכה המקומי כבר פעיל');
-    else state.openPrompt();
+    if (state.unlocked) {
+      toast('מצב העריכה כבר פעיל');
+      return;
+    }
+    const blocker = currentEditModeBlocker();
+    if (blocker) {
+      toast(blocker, { tone: 'error' });
+      return;
+    }
+    state.enable();
+    toast(
+      accountMode
+        ? 'מצב עריכה הופעל. אפשר לשבץ רק מקצועות שהמנהל הקצה לך; השינויים נשמרים בחשבון.'
+        : 'מצב עריכה מקומי הופעל. השינויים נשמרים רק במכשיר הזה.',
+      { tone: 'success', duration: 4500 },
+    );
   }, []);
 }

@@ -113,14 +113,17 @@ dev server.
 
 ### Hidden edit mode
 
-Tap the title **"מ. שעות ושינויים" seven times quickly**, then enter the demonstration code
-**`581026`**. A yellow strip shows that you are editing the **personal local copy** (in account
-mode: your own timetable, saved to your account). Use **יציאה** to leave; a cold start always
-opens in viewing mode.
+Tap the title **"מ. שעות ושינויים" seven times quickly**. Edit mode opens at once, with no code
+or confirmation. A yellow strip shows that you are editing the **personal local copy** (in
+account mode: your own timetable, saved to your account). Use **יציאה** to leave; a cold start
+always opens in viewing mode.
 
-> The code is a UI convenience that keeps edit controls out of the way. It is **not**
-> authentication, it is visible in the source, and it protects nothing. It does not grant any
-> access to the official WEBTOP system.
+> The gesture is a UI shortcut that keeps edit controls out of the way. It is **not** a security
+> mechanism and grants no access to the official WEBTOP system or to the admin panel. In account
+> mode it works only with a signed-in session the server has confirmed (and a connection), and
+> the server decides what may change: only the signed-in student's own timetable, using only
+> the subjects an admin assigned. In local mode there are no accounts and nothing leaves the
+> device.
 
 To edit a lesson, tap it (or an empty "+ הוספת שיעור" cell) while edit mode is on. In local mode
 the **כלים** screen (`#/tools`) holds presets, the profile/class name, backup and import, and
@@ -207,7 +210,7 @@ src/
 │   │                    hooks/ (swipe, scroll), domain/ (pure: ops, days, periods, drafts, ICS),
 │   │                    timetableActions (undoable use-cases), view store
 │   ├── presets/         Preset picker/manager/form + pure preset↔lesson rules + actions
-│   ├── admin/           7-tap detector, demo-code check, edit-mode store and capabilities,
+│   ├── admin/           7-tap detector, edit-mode store and capabilities (who may enter),
 │   │                    local tools screen, import/export & reset use-cases
 │   ├── account/         Account mode: login screen and gate, session runtime (validation,
 │   │                    heartbeat, logout), timetable sync, bundle schema/mapping, account UI
@@ -298,7 +301,8 @@ day must have exactly one cell per period: a lesson object or `null` for an empt
     the customised-timetable confirmation; presets CRUD/archive; sessions dashboard force
     disconnect; student sign-in, persistence across reloads and token expiry, second device
     rejected, simultaneous sign-ins (exactly one wins), sign-out on disconnect/revoke/disable,
-    restricted edit mode saved to the server, and the edit code never opening the admin panel.
+    restricted edit mode (opened by the gesture alone) saved to the server, and the gesture never
+    opening the admin panel.
 
 Not covered automatically: real iOS Safari/WebKit (CI uses Chromium), "Add to Home Screen"
 itself, iOS launch images, and a hosted Supabase project (the tests use the local stack).

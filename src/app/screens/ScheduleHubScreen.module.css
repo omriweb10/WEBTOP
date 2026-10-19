@@ -1,0 +1,8 @@
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  animation: fade-in var(--duration-medium) var(--ease-standard);
+}

@@ -1,0 +1,39 @@
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-target);
+  height: var(--touch-target);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  transition: background-color var(--duration-fast) var(--ease-standard);
+}
+
+.button:active {
+  background: rgb(255 255 255 / 0.1);
+}
+
+.button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.badge {
+  position: absolute;
+  top: 4px;
+  inset-inline-end: 0;
+  min-width: 22px;
+  height: 16px;
+  padding: 0 5px;
+  border-radius: 8px;
+  background: var(--color-badge);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+}

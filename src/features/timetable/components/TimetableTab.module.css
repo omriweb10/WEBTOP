@@ -1,0 +1,24 @@
+.gap {
+  flex: none;
+  height: var(--panel-gap);
+  background: var(--color-page);
+}
+
+/* Scrolls under the fixed day bar; pan-y keeps native vertical scrolling while
+   leaving horizontal drags to the swipe handler. */
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  background: var(--color-surface);
+}
+
+.tableWrap {
+  /* Measured: 72pt of space below the last row, clearing the FAB. */
+  padding: 0 var(--page-gutter) 72px;
+  will-change: transform;
+}

@@ -1,0 +1,37 @@
+/*
+ * Full-height app frame. In standalone mode the status bar is translucent
+ * (black-translucent), so the top inset is painted with the reference's dark band and
+ * the home-indicator inset with the same colour — no simulated iOS chrome is drawn.
+ */
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--color-safe-area);
+}
+
+.safeTop {
+  flex: none;
+  height: var(--safe-top);
+  background: var(--color-safe-area);
+}
+
+.screen {
+  flex: 1;
+  min-height: 0;
+  padding-inline: var(--safe-right) var(--safe-left);
+}
+
+.safeBottom {
+  flex: none;
+  height: var(--safe-bottom);
+  background: var(--color-safe-area);
+}
+
+@media print {
+  .shell {
+    display: none;
+  }
+}

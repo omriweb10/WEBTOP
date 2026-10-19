@@ -1,0 +1,18 @@
+.add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  min-height: 26px;
+  border: 1px dashed #3a4253;
+  border-radius: var(--card-radius);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  touch-action: manipulation;
+}
+
+.add:active {
+  background: rgb(255 255 255 / 0.05);
+}

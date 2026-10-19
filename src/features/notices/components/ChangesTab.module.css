@@ -1,0 +1,8 @@
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding: var(--panel-gap) 0 24px;
+}

@@ -1,0 +1,89 @@
+/*
+ * Design tokens — the single source for colours, sizes and typography.
+ * Values were sampled/measured from the reference recording (402×874 pt iPhone,
+ * video scale 1.2736 px/pt); see docs/visual-spec.md for the method and notes.
+ */
+:root {
+  color-scheme: dark;
+
+  /* Surfaces */
+  --color-safe-area: #12161c; /* status-bar band, gaps between panels, home-indicator band */
+  --color-page: #12161c;
+  --color-appbar: #14263c;
+  --color-appbar-deep: #0f2135; /* sidebar header */
+  --color-surface: #191e29; /* tabs, display panel, table area, cards */
+  --color-surface-raised: #1b1f27; /* day selector bar */
+  --color-surface-section: #181e26; /* notices sections */
+  --color-surface-tile: #2b3343; /* home shortcut tiles */
+  --color-table-header: #252d3c;
+  --color-border: #2d323f; /* table grid lines */
+  --color-divider: #262b37;
+  --color-input-line: #353a47;
+  --color-backdrop: rgb(6 9 14 / 0.45);
+
+  /* Text */
+  --color-text: #dde1e7;
+  --color-text-strong: #fbfdff;
+  --color-text-secondary: #c9ced4;
+  /* Reference label is ~#393e49 (contrast 1.6:1); raised for WCAG AA legibility. */
+  --color-text-muted: #9097a2;
+  --color-accent: #82b1f2; /* active tab, links, active sidebar item bar */
+  --color-accent-strong: #a8caf6; /* active sidebar item text */
+  --color-day-active: #45aba0;
+  --color-on-day-active: #062b27;
+  --color-danger: #f26b6b;
+  --color-badge: #f75f67;
+  --color-success: #4fc08d;
+  --color-fab: #ffffff;
+  --color-on-fab: #1f232b;
+  --color-edit: #f2b84b; /* edit-mode indicator */
+
+  /* Lesson cards (background tint ratio lives in tokens.ts: CARD_TINT_RATIO) */
+  --card-accent-width: 4px;
+  --card-radius: 3px;
+
+  /* Typography */
+  --font-family: 'Open Sans', 'Arial Hebrew', 'Noto Sans Hebrew', system-ui, -apple-system, sans-serif;
+  --font-size-xs: 10px;
+  --font-size-sm: 12px; /* lesson cards, period labels, tabs */
+  --font-size-md: 13px;
+  --font-size-base: 14px;
+  --font-size-lg: 16px; /* app-bar title */
+  --font-size-xl: 18px;
+  --line-height-dense: 18px;
+
+  /* Layout (pt) */
+  --appbar-height: 55px;
+  --tabs-height: 48px;
+  --tab-indicator: 2px;
+  --display-panel-height: 64px;
+  --panel-gap: 8px;
+  --day-bar-height: 58px;
+  --day-circle: 32px;
+  --page-gutter: 16px;
+  --period-column: 92px;
+  --table-header-height: 45px;
+  --cell-padding: 4px;
+  --period-padding: 8px;
+  --fab-size: 56px;
+  --sidebar-width: min(80vw, 321px);
+  --touch-target: 44px;
+
+  /* Safe areas (iOS notch / Dynamic Island / home indicator) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  /* Motion */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --duration-fast: 150ms;
+  --duration-medium: 240ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-medium: 0ms;
+  }
+}

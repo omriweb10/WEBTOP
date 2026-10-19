@@ -1,0 +1,158 @@
+.dateBar {
+  flex: none;
+  margin: 0;
+  padding: 2px 16px 8px;
+  background: var(--color-appbar);
+  font-size: var(--font-size-base);
+  text-align: center;
+  color: var(--color-text);
+}
+
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding: 8px 0 24px;
+}
+
+.scroll > section {
+  margin-bottom: 16px;
+}
+
+.greeting {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 124px;
+  padding: 12px 16px;
+  background: var(--color-surface);
+}
+
+.greetingText {
+  flex: 1;
+  margin: 8px 0 0;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.illustration {
+  width: 62%;
+  height: 100px;
+}
+
+.link,
+.editLink {
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+}
+
+.link {
+  min-height: 44px;
+  padding: 0;
+}
+
+.editLink {
+  min-height: 40px;
+  padding: 0 4px;
+  font-size: var(--font-size-base);
+  font-weight: 700;
+}
+
+.tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 0;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  width: 90px;
+  height: 88px;
+  padding: 0;
+  border: 1px solid #333c4d;
+  border-radius: 6px;
+  background: var(--color-surface-tile);
+  overflow: hidden;
+}
+
+.tileIcon {
+  display: grid;
+  place-items: center;
+  flex: 1;
+}
+
+.tileLabel {
+  padding: 4px 2px;
+  background: #222937;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-text);
+}
+
+.lessons {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lesson {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 0;
+}
+
+.lesson + .lesson {
+  border-top: 1px solid #222833;
+}
+
+.lessonSubject {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  text-align: start;
+}
+
+.lessonTeacher {
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+}
+
+.lessonTime {
+  flex: none;
+  font-size: var(--font-size-base);
+  font-weight: 700;
+}
+
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--touch-target);
+  font-size: var(--font-size-base);
+}
+
+.checkRow input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--color-accent);
+}

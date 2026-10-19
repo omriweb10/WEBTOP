@@ -1,0 +1,40 @@
+.banner {
+  position: fixed;
+  inset-inline: 12px;
+  bottom: calc(var(--safe-bottom) + 16px);
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 8px 14px;
+  padding-inline-start: 14px;
+  border-radius: 12px;
+  background: #1d3352;
+  border: 1px solid #335b8f;
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.45);
+  font-size: var(--font-size-base);
+  animation: fade-in var(--duration-medium) var(--ease-standard);
+}
+
+.banner > span {
+  flex: 1;
+}
+
+.button,
+.later {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.button {
+  background: var(--color-accent);
+  color: #0b1a2e;
+}
+
+.later {
+  background: transparent;
+  color: var(--color-text-secondary);
+}

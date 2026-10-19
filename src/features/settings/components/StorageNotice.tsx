@@ -3,7 +3,7 @@ import { Button } from '../../../components/ui/Button';
 import { localStore, requestPersistentStorage } from '../../../services/storage/appStorage';
 import styles from './SettingsScreen.module.css';
 
-/** Explains where data lives and what can erase it; offers to request persistent storage. */
+/** Local storage status: backup advice, unavailable storage, and a persistent-storage request. */
 export function StorageNotice() {
   const [persisted, setPersisted] = useState<boolean | null>(null);
 
@@ -20,13 +20,8 @@ export function StorageNotice() {
 
   return (
     <div className={styles.notice} role="note">
-      <p>
-        <strong>הנתונים נשמרים רק במכשיר הזה</strong> (אחסון מקומי של הדפדפן). מחיקת נתוני אתרים ב‑Safari, הסרת האפליקציה
-        ממסך הבית או מעבר לכתובת אתר אחרת עלולים למחוק את השינויים. ב‑iPhone, לאפליקציה שנוספה למסך הבית יש אחסון נפרד
-        מ‑Safari — יש לייבא את הנתונים מתוך האפליקציה עצמה.
-      </p>
-      <p>מומלץ לייצא גיבוי JSON מדי פעם (במצב העריכה).</p>
-      {!localStore.persistent && <p className={styles.warning}>האחסון המקומי אינו זמין כרגע — שינויים לא יישמרו אחרי סגירה.</p>}
+      <p>מומלץ לייצא גיבוי JSON מדי פעם (בכלי העריכה).</p>
+      {!localStore.persistent && <p className={styles.warning}>לא ניתן לשמור נתונים בדפדפן הזה כרגע — שינויים לא יישמרו אחרי סגירה.</p>}
       {persisted === false && (
         <Button
           icon="lock"

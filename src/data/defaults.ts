@@ -3,7 +3,7 @@ import type { Notice, Profile, SchoolEvent, Settings } from '../schemas/content'
 
 export const DEFAULT_PROFILE: Profile = {
   studentName: '',
-  subtitle: 'עותק אישי · לא רשמי',
+  subtitle: 'עותק אישי',
   className: "י' 1 (דוגמה)",
 };
 

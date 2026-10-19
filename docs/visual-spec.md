@@ -119,7 +119,7 @@ brief's initial table for the subjects the screenshot does not show.
 | Item | Reference | App | Why |
 |---|---|---|---|
 | "תצוגה" label colour | `#393e49` | `#9097a2` | The reference contrast is 1.6:1; raised to meet WCAG AA |
-| Sidebar header | Official logo, real photo, "כניסה אחרונה" | School icon, "WEBTOP" plus a **לא רשמי** pill, initials avatar, "פתיחה קודמת" (local launch time) | Unofficial: no official assets and no account |
+| Sidebar header | Official logo, real photo, "כניסה אחרונה" | School icon and the app's own name ("מערכת שעות"), profile picture or initials, "פתיחה קודמת" (local launch time) | Not the official app: no official assets or brand; Settings → אודות explains what the app is |
 | Bell icon (timetable) | Unknown function | Toggles local change alerts | No fake buttons: it must do something real |
 | File icon (timetable) | Unknown function | Export: `.ics` calendar or print/PDF | Same |
 | Calendar / filter / file icons (events) | Unknown function | Month view, kind filter, `.ics` export | Same |

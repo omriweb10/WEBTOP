@@ -13,14 +13,40 @@
   line-height: 1.6;
 }
 
-.disclaimer {
-  margin: 0 0 8px;
+.lead {
+  margin: 0 0 10px;
+  font-weight: 600;
+  color: var(--color-text-title);
+}
+
+.independence {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-inline-start: 3px solid var(--color-accent);
+  border-radius: 6px;
+  background: var(--color-accent-soft);
+}
+
+.independence p {
+  margin: 0;
+}
+
+.independence p + p {
+  margin-top: 6px;
 }
 
 .facts {
   margin: 0;
   padding-inline-start: 18px;
   color: var(--color-text-secondary);
+}
+
+.facts li + li {
+  margin-top: 4px;
+}
+
+.facts + .notice {
+  margin-top: 14px;
 }
 
 .meta {

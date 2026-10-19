@@ -32,9 +32,3 @@
   color: var(--color-text);
 }
 
-.note {
-  margin: 12px 0;
-  font-size: var(--font-size-md);
-  line-height: 1.6;
-  color: var(--color-text-muted);
-}

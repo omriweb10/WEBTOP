@@ -1,13 +1,20 @@
 /*
- * Full-height app frame. In standalone mode the status bar is translucent
+ * Full-screen app frame. In standalone mode the status bar is translucent
  * (black-translucent), so the top inset is painted with the reference's dark band and
  * the home-indicator inset with the same colour — no simulated iOS chrome is drawn.
+ *
+ * The frame is pinned to the viewport box (fixed, inset 0) instead of being given a
+ * viewport-unit height: in an iOS Home Screen app whose status bar is translucent,
+ * WebKit resolves 100vh/100dvh to the screen height minus the status bar, which left a
+ * band of the page background below the frame (the top inset's height plus the home
+ * indicator). The viewport box itself always matches the real web view, whichever
+ * status-bar style the app was launched with, so both themes get the same layout.
  */
 .shell {
+  position: fixed;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
   overflow: hidden;
   background: var(--color-safe-area);
 }

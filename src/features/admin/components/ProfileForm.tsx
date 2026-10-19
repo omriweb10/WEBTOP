@@ -39,7 +39,7 @@ function ProfileFields({ saved }: { saved: Profile }) {
         label="שם לתצוגה"
         value={draft.studentName}
         onValueChange={(studentName) => setDraft({ ...draft, studentName })}
-        hint="מוצג בתפריט ובברכה. נשמר רק במכשיר."
+        hint="מוצג בתפריט ובברכה."
         maxLength={60}
       />
       <TextField label="שורת משנה בתפריט" value={draft.subtitle} onValueChange={(subtitle) => setDraft({ ...draft, subtitle })} maxLength={80} />

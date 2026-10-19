@@ -5,7 +5,7 @@ import { toast } from '../../../store/uiStore';
 import { useEditModeStore } from '../editModeStore';
 import styles from './EditModeBar.module.css';
 
-/** Strip shown under the app bar while editing: where changes are saved, tools, exit. */
+/** Strip shown under the app bar while editing: the mode's name, tools, exit. */
 export function EditModeBar() {
   const lock = useEditModeStore((state) => state.lock);
   const route = useRoute();
@@ -13,15 +13,7 @@ export function EditModeBar() {
     <div className={styles.bar} role="region" aria-label="מצב עריכה">
       <Icon name="edit" size={18} className={styles.icon} />
       <p className={styles.text}>
-        {accountMode ? (
-          <>
-            <strong>עריכת המערכת שלי</strong> · השינויים נשמרים בחשבון שלך
-          </>
-        ) : (
-          <>
-            <strong>מצב עריכה</strong> · שינויים נשמרים בעותק האישי במכשיר זה בלבד
-          </>
-        )}
+        <strong>{accountMode ? 'עריכת המערכת שלי' : 'מצב עריכה'}</strong>
       </p>
       {!accountMode && route.name !== 'tools' && (
         <button type="button" className={styles.button} onClick={() => navigate({ name: 'tools' })}>

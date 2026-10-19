@@ -54,11 +54,6 @@ export function AccountSection() {
           </div>
         </div>
         {summary.bio && <p className={styles.bio}>{summary.bio}</p>}
-        <p className={styles.note}>
-          החיבור נשמר במכשיר הזה ללא הגבלת זמן — גם אחרי סגירה, הפעלה מחדש או חוסר פעילות — עד שתתנתקו, או עד שהמנהל ינתק אותו
-          או יבטל את הקוד. אם המערכת תמחק את נתוני האתר (למשל ניקוי נתוני Safari או הסרת האפליקציה ממסך הבית), יהיה צורך
-          להתחבר מחדש, ואם הקוד עדיין רשום כמחובר — לבקש מהמנהל לנתק את החיבור הקודם.
-        </p>
         <Button icon="logout" variant="danger" disabled={busy || !logout} onClick={() => void onLogout()}>
           {busy ? 'מתנתק…' : 'התנתקות'}
         </Button>

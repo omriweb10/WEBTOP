@@ -7,7 +7,7 @@ import { UnderlineSelect } from '../../../components/ui/UnderlineSelect';
 import type { EventKind, SchoolEvent } from '../../../schemas/content';
 import { useEventsStore, useSettingsStore } from '../../../store/dataStores';
 import { formatIsoDmy, fromIsoDate, hebrewMonthLabel } from '../../../utils/dates';
-import { useIsEditing } from '../../admin/editModeStore';
+import { useCanEditLocalContent } from '../../admin/editCapabilities';
 import { EVENT_KIND_LABELS, filterEvents, groupEventsByMonth } from '../domain/eventOps';
 import { eventActions } from '../eventActions';
 import { useEventsViewStore } from '../eventsViewStore';
@@ -22,7 +22,7 @@ export function EventsTab() {
   const settings = useSettingsStore((state) => state.value);
   const { group, setGroup, month, shiftMonth, selectedDate, selectDate } = useEventsViewStore();
   const groups = useEventGroups();
-  const editing = useIsEditing();
+  const editing = useCanEditLocalContent();
   const [target, setTarget] = useState<{ event: SchoolEvent } | { kind: EventKind } | null>(null);
 
   const filtered = useMemo(

@@ -1,0 +1,55 @@
+# Supabase CLI configuration for WEBTOP (`supabase link`, `supabase db push`,
+# `supabase functions deploy`). Hosted-project auth settings must also be set in the
+# dashboard; see docs/supabase-setup.md.
+project_id = "webtop"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 16
+
+[storage]
+enabled = true
+file_size_limit = "2MiB"
+
+[auth]
+enabled = true
+site_url = "http://localhost:5173/WEBTOP/"
+additional_redirect_urls = []
+# Access tokens are short-lived; the session itself lives on through rotating refresh tokens.
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+# Nobody may sign up. Admin accounts are created by the project owner; student auth users
+# are created by the student-login Edge Function.
+enable_signup = false
+enable_anonymous_sign_ins = false
+
+[auth.rate_limit]
+# Every student login verifies a one-time token from the Edge Function, so the per-IP
+# verification limit applies to all students together. Guessing is limited separately,
+# per client IP, inside the database (private.check_login_rate).
+token_verifications = 1000
+token_refresh = 1800
+
+[auth.email]
+enable_signup = false
+enable_confirmations = false
+double_confirm_changes = true
+
+# No [auth.sessions] timebox or inactivity_timeout: a student session lasts until the
+# student logs out, an admin disconnects it, or the code/account is revoked.
+
+[functions.student-login]
+# Public endpoint: the access code is the credential. Verification happens in the function.
+verify_jwt = false
+
+[functions.admin-access-code]
+# The function validates the caller's Auth session server-side and requires an admin row.
+verify_jwt = false

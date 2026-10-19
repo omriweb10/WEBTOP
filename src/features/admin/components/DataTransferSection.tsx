@@ -7,7 +7,7 @@ import { BACKUP_PART_LABELS, parseBackup, type ExportScope } from '../../../serv
 import { readFileAsText } from '../../../services/files/fileTransfer';
 import { toast } from '../../../store/uiStore';
 import { exportData, importBackup } from '../dataActions';
-import styles from './AdminScreen.module.css';
+import styles from './LocalToolsScreen.module.css';
 
 const EXPORTS: ReadonlyArray<{ scope: ExportScope; label: string }> = [
   { scope: 'all', label: 'גיבוי מלא' },

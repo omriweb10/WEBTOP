@@ -1,16 +1,12 @@
 import { useState } from 'react';
+import { useAccountStore } from '../../features/account/accountStore';
 import type { Profile } from '../../schemas/content';
 import { localStore } from '../../services/storage/appStorage';
 import { LAST_OPENED_KEY } from '../../services/storage/slices';
 import { formatDmy } from '../../utils/dates';
+import { Avatar } from '../ui/Avatar';
 import { Icon } from '../ui/Icon';
 import styles from './Sidebar.module.css';
-
-/** Initials for the avatar circle (first letters of up to two words). */
-function initialsOf(name: string): string {
-  const words = name.trim().split(/\s+/).filter(Boolean);
-  return words.slice(0, 2).map((w) => w[0]).join('') || '?';
-}
 
 /** "DD/MM/YYYY (HH:MM)" for the previous app launch, or null if unknown. */
 function previousLaunchLabel(): string | null {
@@ -22,9 +18,10 @@ function previousLaunchLabel(): string | null {
   return `${formatDmy(date)} (${time})`;
 }
 
-/** Drawer header: unofficial brand line, local display name and previous launch time. */
+/** Drawer header: unofficial brand line, profile picture, display name and previous launch time. */
 export function SidebarHeader({ profile }: { profile: Profile }) {
   const [lastLaunch] = useState(previousLaunchLabel);
+  const avatarUrl = useAccountStore((state) => state.avatarUrl);
   const name = profile.studentName.trim() || 'תלמיד/ה';
   return (
     <div className={styles.header}>
@@ -39,9 +36,7 @@ export function SidebarHeader({ profile }: { profile: Profile }) {
         <span className={styles.unofficial}>לא רשמי</span>
       </div>
       <div className={styles.identity}>
-        <span className={styles.avatar} aria-hidden="true">
-          {initialsOf(name)}
-        </span>
+        <Avatar name={name} src={avatarUrl} size={40} />
         <div className={styles.identityText}>
           <span className={styles.name}>{name}</span>
           {lastLaunch && <span className={styles.lastLogin}>פתיחה קודמת: {lastLaunch}</span>}

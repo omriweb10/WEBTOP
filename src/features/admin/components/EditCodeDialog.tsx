@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Button } from '../../../components/ui/Button';
 import { TextField } from '../../../components/ui/fields';
 import { Modal } from '../../../components/ui/Modal';
+import { accountMode } from '../../../config/backend';
 import { toast } from '../../../store/uiStore';
 import { useEditModeStore } from '../editModeStore';
 import styles from './EditCodeDialog.module.css';
@@ -29,19 +30,31 @@ export function EditCodeDialog() {
     if (unlock(code)) {
       setCode('');
       setError(undefined);
-      toast('מצב עריכה מקומי הופעל. השינויים נשמרים רק במכשיר הזה.', { tone: 'success', duration: 4500 });
+      toast(
+        accountMode
+          ? 'עריכת המערכת הופעלה. אפשר לשבץ רק מקצועות שהמנהל הקצה לך; השינויים נשמרים בחשבון.'
+          : 'מצב עריכה מקומי הופעל. השינויים נשמרים רק במכשיר הזה.',
+        { tone: 'success', duration: 4500 },
+      );
     } else {
       setError('הקוד שגוי');
     }
   };
 
   return (
-    <Modal open={open} variant="dialog" title="מצב עריכה מקומי" onClose={dismiss} initialFocusId={INPUT_ID}>
+    <Modal open={open} variant="dialog" title={accountMode ? 'עריכת המערכת שלי' : 'מצב עריכה מקומי'} onClose={dismiss} initialFocusId={INPUT_ID}>
       <form onSubmit={submit} noValidate>
-        <p className={styles.note}>
-          זהו מצב עריכה של עותק אישי ולא רשמי. הקוד הוא נוחות ממשק בלבד — הוא אינו סיסמה, אינו מגן על מידע ואינו
-          קשור לחשבון WEBTOP כלשהו.
-        </p>
+        {accountMode ? (
+          <p className={styles.note}>
+            מאפשר לסדר את מערכת השעות שלך מתוך המקצועות שהמנהל הקצה לך. הקוד הוא נוחות ממשק בלבד — הוא אינו סיסמה,
+            אינו מעניק הרשאות ניהול ואינו קשור לחשבון WEBTOP כלשהו.
+          </p>
+        ) : (
+          <p className={styles.note}>
+            זהו מצב עריכה של עותק אישי ולא רשמי. הקוד הוא נוחות ממשק בלבד — הוא אינו סיסמה, אינו מגן על מידע ואינו
+            קשור לחשבון WEBTOP כלשהו.
+          </p>
+        )}
         <TextField
           id={INPUT_ID}
           label="קוד"

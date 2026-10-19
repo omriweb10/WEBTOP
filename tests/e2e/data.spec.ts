@@ -8,7 +8,7 @@ test.describe('local data: import/export, notices and events', () => {
   test('exports a valid JSON backup', async ({ page }) => {
     await openApp(page);
     await unlockEditMode(page);
-    await page.goto('#/admin');
+    await page.goto('#/tools');
     const download = page.waitForEvent('download');
     await page.getByRole('button', { name: 'ייצוא: גיבוי מלא' }).click();
     const file = await download;
@@ -23,7 +23,7 @@ test.describe('local data: import/export, notices and events', () => {
     await openApp(page);
     await unlockEditMode(page);
     const before = await firstRow(page).textContent();
-    await page.goto('#/admin');
+    await page.goto('#/tools');
     await page.getByTestId('import-input').setInputFiles({ name: 'broken.json', mimeType: 'application/json', buffer: Buffer.from('{ nope') });
     await expect(page.getByRole('alert')).toContainText('הקובץ אינו JSON תקין');
     const wrongShape = { format: 'webtop-pwa-backup', formatVersion: 1, exportedAt: '', appVersion: '1', data: { presets: [{ id: 'x' }] } };
@@ -49,7 +49,7 @@ test.describe('local data: import/export, notices and events', () => {
         profile: { studentName: 'בדיקה', subtitle: 'שורה', className: "י' 9" },
       },
     };
-    await page.goto('#/admin');
+    await page.goto('#/tools');
     await page.getByTestId('import-input').setInputFiles({ name: 'ok.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(backup)) });
     const preview = page.getByRole('dialog', { name: 'תצוגה מקדימה לייבוא' });
     await expect(preview.getByLabel('מערכת השעות')).toBeChecked();

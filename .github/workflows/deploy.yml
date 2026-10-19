@@ -1,7 +1,12 @@
 name: CI & GitHub Pages
 
-# Pull requests: type-check, lint, unit tests, production build and Playwright e2e.
+# Pull requests: type-check, lint, unit tests, production build and Playwright e2e, plus the
+# backend suite and account-mode e2e against a local Supabase-equivalent stack.
 # Pushes to main (and manual runs on main): the same checks, then deploy to Pages.
+#
+# Repository variables (Settings → Secrets and variables → Actions → Variables):
+#   VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY — public values baked into the Pages build.
+#   Leave them unset to deploy the local-only app. Never put the service-role key here.
 on:
   push:
     branches: [main]
@@ -49,15 +54,72 @@ jobs:
           path: playwright-report
           retention-days: 7
 
+      - name: Build the Pages site (with the Supabase settings, when configured)
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+        run: npm run build
+
       - name: Upload Pages artifact
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v4
         with:
           path: dist
 
+  backend:
+    name: Backend & account-mode e2e (local Supabase stack)
+    # Ships PostgreSQL 16 server binaries; Supabase Auth and PostgREST are downloaded.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Cache Supabase Auth / PostgREST binaries
+        uses: actions/cache@v4
+        with:
+          path: .local-stack/bin
+          key: local-stack-bin-${{ hashFiles('scripts/local-stack/binaries.mjs') }}
+
+      - name: Start the local stack (Postgres, Supabase Auth, PostgREST, Edge Functions)
+        run: |
+          nohup npm run stack > stack.log 2>&1 &
+          for i in $(seq 1 150); do
+            if grep -q "ready at" stack.log; then cat stack.log; exit 0; fi
+            sleep 1
+          done
+          cat stack.log; tail -n 50 .local-stack/logs/*.log || true
+          exit 1
+
+      - name: Backend tests (RLS, single-session rule, codes, admin RPCs)
+        run: npm run test:backend
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Account-mode end-to-end tests
+        run: npm run test:e2e:account
+
+      - name: Upload stack logs and Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-logs
+          path: |
+            stack.log
+            .local-stack/logs
+            playwright-report-account
+          retention-days: 7
+
   deploy:
     name: Deploy to GitHub Pages
-    needs: check
+    needs: [check, backend]
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:

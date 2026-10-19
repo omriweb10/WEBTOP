@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Button } from '../../../components/ui/Button';
 import { ColorPicker } from '../../../components/ui/ColorPicker';
-import { confirm } from '../../../components/ui/confirmStore';
 import { TextField } from '../../../components/ui/fields';
 import { Modal } from '../../../components/ui/Modal';
 import { COLOR_SWATCHES } from '../../../data/subjectPalette';
@@ -21,10 +20,10 @@ import {
   type LessonDraft,
   type LessonFields,
 } from '../domain/lessonDraft';
-import { getLesson, nextSlot, type Slot } from '../domain/timetableOps';
+import { getLesson, type Slot } from '../domain/timetableOps';
 import { timetableActions } from '../timetableActions';
 import { LessonCard } from './LessonCard';
-import { MoveCopyPanel } from './MoveCopyPanel';
+import { SavedLessonActions } from './SavedLessonActions';
 import styles from './LessonEditor.module.css';
 
 const FIELD_LABELS: Record<string, string> = { subject: 'מקצוע', teacher: 'מורה', room: 'חדר', color: 'צבע' };
@@ -46,7 +45,6 @@ export function LessonEditor({ slot, onClose }: LessonEditorProps) {
   const saved = getLesson(timetable, slot);
   const [draft, setDraft] = useState<LessonDraft>(() => draftFromLesson(saved));
   const [showErrors, setShowErrors] = useState(false);
-  const [moving, setMoving] = useState(false);
 
   const errors = useMemo(() => validateDraft(draft), [draft]);
   const preset = !draft.empty && draft.presetId ? presets.find((p) => p.id === draft.presetId) : undefined;
@@ -54,7 +52,6 @@ export function LessonEditor({ slot, onClose }: LessonEditorProps) {
 
   const period = timetable.periods[slot.index];
   const title = `${getDayInfo(slot.day).name} · שעה ${slot.index + 1}${period ? ` (${formatPeriodRange(period)})` : ''}`;
-  const hasNext = nextSlot(timetable, slot) !== null;
 
   /** Updates one field; typing into an empty period starts a custom lesson. */
   const setField = (field: keyof Omit<LessonFields, 'presetId'>, value: string) => {
@@ -70,37 +67,6 @@ export function LessonEditor({ slot, onClose }: LessonEditorProps) {
     const lesson = draftToLesson(draft, saved?.id ?? createId('lsn'));
     if (lesson) timetableActions.saveLesson(slot, lesson);
     else timetableActions.clear(slot);
-    onClose();
-  };
-
-  /** Deletes the saved lesson after confirmation, leaving an empty period. */
-  const remove = async () => {
-    if (!saved) return;
-    const ok = await confirm({
-      title: 'מחיקת שיעור',
-      message: `למחוק את „${saved.subject}” ולהשאיר את השעה ריקה?`,
-      confirmLabel: 'מחיקה',
-      tone: 'danger',
-    });
-    if (!ok) return;
-    timetableActions.clear(slot);
-    onClose();
-  };
-
-  /** Copies the saved lesson into the next period (asks before overwriting). */
-  const duplicate = async () => {
-    const target = nextSlot(timetable, slot);
-    if (!target || !saved) return;
-    const occupant = getLesson(timetable, target);
-    if (occupant) {
-      const ok = await confirm({
-        title: 'שכפול לשעה הבאה',
-        message: `בשעה ${target.index + 1} קיים „${occupant.subject}”. להחליף אותו בעותק של „${saved.subject}”?`,
-        confirmLabel: 'החלפה',
-      });
-      if (!ok) return;
-    }
-    timetableActions.duplicateToNext(slot);
     onClose();
   };
 
@@ -171,23 +137,7 @@ export function LessonEditor({ slot, onClose }: LessonEditorProps) {
         <ColorPicker label="צבע" value={draft.color} swatches={COLOR_SWATCHES} onChange={(c) => setField('color', c)} />
       )}
 
-      {saved && (
-        <>
-          <h3 className={styles.heading}>פעולות על השיעור השמור</h3>
-          <div className={styles.actionsGrid}>
-            <Button icon="libraryAdd" onClick={duplicate} disabled={!hasNext}>
-              שכפול לשעה הבאה
-            </Button>
-            <Button icon="move" onClick={() => setMoving((v) => !v)} aria-expanded={moving}>
-              העברה / העתקה…
-            </Button>
-            <Button icon="delete" variant="danger" onClick={remove}>
-              מחיקה (שעה ריקה)
-            </Button>
-          </div>
-          {moving && <MoveCopyPanel timetable={timetable} from={slot} onDone={onClose} />}
-        </>
-      )}
+      {saved && <SavedLessonActions timetable={timetable} slot={slot} saved={saved} onDone={onClose} />}
     </Modal>
   );
 }

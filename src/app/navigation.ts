@@ -56,7 +56,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     label: 'הגדרות ואודות',
     icon: 'settings',
     route: { name: 'settings' },
-    matches: (r) => r.name === 'settings' || r.name === 'admin',
+    matches: (r) => r.name === 'settings' || r.name === 'tools',
   },
 ];
 

@@ -5,10 +5,10 @@ import { StorageNotice } from '../../settings/components/StorageNotice';
 import { DataTransferSection } from './DataTransferSection';
 import { ProfileForm } from './ProfileForm';
 import { ResetSection } from './ResetSection';
-import styles from './AdminScreen.module.css';
+import styles from './LocalToolsScreen.module.css';
 
-/** Edit-mode tools: profile, subject presets, backup/import and resets. */
-export function AdminScreen() {
+/** Local edit-mode tools (local mode only): profile, subject presets, backup/import and resets. */
+export function LocalToolsScreen() {
   return (
     <ScreenFrame title="כלי עריכה מקומיים">
       <div className={styles.scroll}>

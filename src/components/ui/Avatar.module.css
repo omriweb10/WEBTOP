@@ -1,0 +1,23 @@
+.avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #2b4a73, #1d3352);
+  color: var(--color-text-strong);
+  font-weight: 700;
+  line-height: 1;
+  user-select: none;
+}
+
+.square {
+  border-radius: 12px;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

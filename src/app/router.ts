@@ -22,11 +22,15 @@ export const PLACEHOLDER_IDS = [
 ] as const;
 export type PlaceholderId = (typeof PLACEHOLDER_IDS)[number];
 
+export const ADMIN_SECTIONS = ['users', 'sessions', 'presets', 'templates', 'content'] as const;
+export type AdminSection = (typeof ADMIN_SECTIONS)[number];
+
 export type Route =
   | { name: 'home' }
   | { name: 'schedule'; tab: ScheduleTab }
   | { name: 'settings' }
-  | { name: 'admin' }
+  | { name: 'tools' }
+  | { name: 'admin'; section: AdminSection; id?: string }
   | { name: 'placeholder'; id: PlaceholderId };
 
 export const DEFAULT_ROUTE: Route = { name: 'schedule', tab: 'timetable' };
@@ -34,7 +38,7 @@ export const DEFAULT_ROUTE: Route = { name: 'schedule', tab: 'timetable' };
 /** Parses a location hash into a route; unknown paths fall back to the timetable. */
 export function parseHash(hash: string): Route {
   const parts = hash.replace(/^#\/?/, '').split('/').filter(Boolean);
-  const [first, second] = parts;
+  const [first, second, third] = parts;
   switch (first) {
     case 'home':
       return { name: 'home' };
@@ -44,8 +48,13 @@ export function parseHash(hash: string): Route {
         : DEFAULT_ROUTE;
     case 'settings':
       return { name: 'settings' };
-    case 'admin':
-      return { name: 'admin' };
+    case 'tools':
+      return { name: 'tools' };
+    case 'admin': {
+      const section = ADMIN_SECTIONS.includes(second as AdminSection) ? (second as AdminSection) : 'users';
+      const id = third && /^[0-9a-f-]{36}$/.test(third) ? third : undefined;
+      return id ? { name: 'admin', section, id } : { name: 'admin', section };
+    }
     case 'page':
       return PLACEHOLDER_IDS.includes(second as PlaceholderId)
         ? { name: 'placeholder', id: second as PlaceholderId }
@@ -64,8 +73,10 @@ export function routeToHash(route: Route): string {
       return `#/schedule/${route.tab}`;
     case 'settings':
       return '#/settings';
+    case 'tools':
+      return '#/tools';
     case 'admin':
-      return '#/admin';
+      return `#/admin/${route.section}${route.id ? `/${route.id}` : ''}`;
     case 'placeholder':
       return `#/page/${route.id}`;
   }

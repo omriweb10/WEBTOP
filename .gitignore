@@ -1,12 +1,14 @@
 # Dependencies & build output
 node_modules/
 dist/
+dist-account/
 coverage/
 *.tsbuildinfo
 
 # Test artifacts
 test-results/
 playwright-report/
+playwright-report-account/
 blob-report/
 
 # Private personal data — NEVER commit (real names, schedule, school)
@@ -24,3 +26,6 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .idea/
+
+# Local Supabase-equivalent test stack (binaries, data, generated keys)
+.local-stack/

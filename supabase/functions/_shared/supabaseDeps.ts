@@ -28,9 +28,17 @@ function anonClient(): SupabaseClient {
   return createClient(requireEnv('SUPABASE_URL'), requireEnv('SUPABASE_ANON_KEY'), SERVER_AUTH);
 }
 
-/** Synthetic, undeliverable e-mail identifying a student's Auth user (RFC 2606 ".invalid"). */
+const DEFAULT_STUDENT_EMAIL_DOMAIN = 'students.webtop.invalid';
+
+/**
+ * Synthetic, undeliverable e-mail identifying a student's Auth user (RFC 2606 ".invalid").
+ * STUDENT_EMAIL_DOMAIN can override the domain for projects whose Auth settings reject it;
+ * existing students keep the address they were created with.
+ */
 export function studentEmail(profileId: string): string {
-  return `student-${profileId}@students.webtop.invalid`;
+  const configured = Deno.env.get('STUDENT_EMAIL_DOMAIN')?.trim().toLowerCase();
+  const domain = configured && /^[a-z0-9.-]+\.[a-z]{2,}$/.test(configured) ? configured : DEFAULT_STUDENT_EMAIL_DOMAIN;
+  return `student-${profileId}@${domain}`;
 }
 
 /** Calls an RPC and throws on error. */

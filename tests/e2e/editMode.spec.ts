@@ -144,14 +144,14 @@ test.describe('hidden local edit mode', () => {
     await editor(page).getByRole('radio', { name: 'לשון', exact: true }).click();
     await editor(page).getByRole('button', { name: 'שמירה' }).click();
 
-    await page.goto('#/admin');
+    await page.goto('#/tools');
     await page.getByRole('button', { name: 'איפוס מערכת השעות לדוגמה' }).click();
     const dialog = page.getByRole('dialog', { name: 'איפוס מערכת השעות לדוגמה' });
     await dialog.getByRole('button', { name: 'ביטול' }).click();
     await page.goto('#/schedule/timetable');
     await expect(row(page, 1)).toContainText('לשון');
 
-    await page.goto('#/admin');
+    await page.goto('#/tools');
     await page.getByRole('button', { name: 'איפוס מערכת השעות לדוגמה' }).click();
     await dialog.getByRole('button', { name: 'איפוס' }).click();
     await page.goto('#/schedule/timetable');

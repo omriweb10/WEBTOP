@@ -110,6 +110,17 @@ describe.skipIf(!stackAvailable)('authorization and isolation', () => {
     expect(env.apiUrl).toBeTruthy();
   });
 
+  it('lets admins change account status and auth links only through the server', async () => {
+    const admin = await adminClient();
+    const { profileId, code } = await createStudent();
+    const a = await loginStudent(code);
+    expect((await admin.from('profiles').update({ status: 'disabled' }).eq('id', profileId)).error).not.toBeNull();
+    expect((await admin.from('profiles').update({ auth_user_id: null }).eq('id', profileId)).error).not.toBeNull();
+    expect((await admin.from('profiles').insert({ display_name: 'x', status: 'disabled' })).error).not.toBeNull();
+    // The session is untouched by the refused writes.
+    expect((await a.client.rpc('get_my_bundle')).error).toBeNull();
+  });
+
   it('only admins may create access codes', async () => {
     const { profileId, code } = await createStudent();
     const { client } = await loginStudent(code);

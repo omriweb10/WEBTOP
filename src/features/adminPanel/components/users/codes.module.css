@@ -1,0 +1,128 @@
+.once {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgb(242 184 75 / 0.1);
+  color: #f6cf86;
+  font-size: var(--font-size-md);
+  line-height: 1.5;
+}
+
+.code {
+  display: block;
+  padding: 18px 12px;
+  border: 1px dashed #3d4a63;
+  border-radius: 14px;
+  background: #10151e;
+  color: var(--color-text-strong);
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: clamp(20px, 7vw, 30px);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-align: center;
+  user-select: all;
+  -webkit-user-select: all;
+  overflow-wrap: anywhere;
+}
+
+.hint {
+  margin: 10px 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.dialogActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.customForm {
+  margin-top: 4px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.input {
+  width: 100%;
+  min-height: 50px;
+  padding: 10px 12px;
+  border: 1px solid #343c4d;
+  border-radius: 12px;
+  background: #121722;
+  color: var(--color-text-strong);
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 18px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.input:focus {
+  border-color: var(--color-accent);
+  outline: none;
+}
+
+.meter {
+  height: 6px;
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #222937;
+}
+
+.meterFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  transition: width var(--duration-fast) var(--ease-standard);
+}
+
+.too_short,
+.weak {
+  background: var(--color-danger);
+}
+
+.fair {
+  background: var(--color-edit);
+}
+
+.strong {
+  background: var(--color-success);
+}
+
+.level {
+  margin: 6px 0 0;
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+}
+
+.warnings {
+  margin: 8px 0 0;
+  padding-inline-start: 18px;
+  color: #ffb4b4;
+  font-size: var(--font-size-md);
+  line-height: 1.5;
+}
+
+.allowWeak {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: var(--font-size-md);
+  line-height: 1.5;
+}
+
+.allowWeak input {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  accent-color: var(--color-danger);
+}

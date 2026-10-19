@@ -2,12 +2,20 @@
 
 > **Unofficial personal project.** This app is *inspired by* the WEBTOP timetable screen. It is
 > **not affiliated with, endorsed by, or connected to WEBTOP**, its vendor, the Ministry of
-> Education or any school. It never asks for WEBTOP credentials, never calls WEBTOP endpoints
-> and stores everything locally on the device.
+> Education or any school. It never asks for WEBTOP credentials and never calls WEBTOP endpoints.
 
 An iPhone-first Progressive Web App that reproduces the look of the WEBTOP "מ. שעות ושינויים"
-screen closely (dark theme, RTL, measured against frames of a reference screen recording). The
-timetable, notices and exams are **edited locally** in a hidden edit mode.
+screen closely (dark theme, RTL, measured against frames of a reference screen recording).
+
+It runs in one of two modes, chosen at build time:
+
+- **Local mode** (no backend configured): the timetable, notices and exams are edited locally
+  in a hidden edit mode and stored on the device.
+- **Account mode** (Supabase configured): an administrator manages students, their profile
+  pictures, subjects, timetables, notices and personal access codes in an admin panel at
+  `#/admin`. Students sign in with their code, **one device per code at a time**, and stay
+  signed in until they log out or an admin disconnects them. Setup:
+  [docs/supabase-setup.md](docs/supabase-setup.md).
 
 | Timetable | Sidebar | Lesson editor (edit mode) |
 |---|---|---|
@@ -37,6 +45,34 @@ timetable, notices and exams are **edited locally** in a hidden edit mode.
 - **PWA**: standalone display, safe-area aware, Apple touch icon and launch images, offline
   after the first load, and a versioned service worker with an update banner.
 
+### Account mode (Supabase)
+
+- **Admin panel** (`#/admin`, Supabase Auth email + password, admins listed in `public.admins`):
+  - **Users**: searchable list with connection and code status; create, edit, disable/enable
+    and delete students (display name, class, optional school and description).
+  - **Profile pictures**: JPG/PNG/WebP upload, drag-to-position crop with zoom, round and square
+    previews, exported as a 512×512 WebP (JPEG fallback) to a private Storage bucket; shown in
+    the student's app bar and menu.
+  - **Access codes**: strong generated codes or custom ones with strength warnings (weak codes
+    need an explicit opt-in); shown **once**, stored only as an HMAC; replace or revoke; last
+    use and current connection shown.
+  - **Sessions dashboard**: who is signed in, on which device, since when, last activity,
+    expiry ("none — until disconnected"), with **Force Disconnect**, revoke code and disable
+    account.
+  - **Subjects (presets)**: name, short name, teacher, room, colour (spec defaults seeded),
+    notes; archive instead of delete when in use; assign to many students at once.
+  - **Templates**: visual week editor (tap a cell, move/copy, mouse drag-and-drop with Alt/Ctrl
+    to copy), bell-time editor (1–13 periods), duplicate, and assign to one or many students
+    with an explicit choice before overwriting customised timetables.
+  - **Per-student timetable** editor and subject access, plus notices and events/exams for
+    everyone or for one student.
+- **Students**: a single access-code field (with a warning never to type a WEBTOP password).
+  The server allows **one live session per code**: a second device is refused, never the
+  first. Sessions persist indefinitely with rotating refresh tokens; nothing expires on
+  inactivity. The 7-tap edit mode lets a signed-in student arrange **their own** timetable from
+  the subjects an admin assigned (teacher/room/colour come from the subject); changes are saved
+  to their account and never grant admin access.
+
 ## Requirements
 
 - Node.js 20.19+ (CI uses Node 22)
@@ -61,6 +97,9 @@ dev server.
 | `lint` | ESLint (typescript-eslint strict and React Hooks / React Compiler rules) |
 | `test` | Vitest unit tests for domain rules, storage, validation and backups |
 | `test:e2e` | Playwright on an iPhone-sized Chromium against the production build under `/WEBTOP/` |
+| `stack` | Starts the local Supabase-equivalent stack (see [docs/supabase-setup.md](docs/supabase-setup.md)) |
+| `test:backend` | Vitest against the running stack: RLS, isolation, single session, codes, admin RPCs |
+| `test:e2e:account` | Playwright in account mode against the running stack (admin panel + students) |
 | `icons` | Regenerates the app icons and iOS launch images (`scripts/generate-icons.mjs`) |
 
 ## Using it on an iPhone
@@ -75,17 +114,22 @@ dev server.
 ### Hidden edit mode
 
 Tap the title **"מ. שעות ושינויים" seven times quickly**, then enter the demonstration code
-**`581026`**. A yellow strip shows that you are editing the **personal local copy**. Use
-**יציאה** to leave; a cold start always opens in viewing mode.
+**`581026`**. A yellow strip shows that you are editing the **personal local copy** (in account
+mode: your own timetable, saved to your account). Use **יציאה** to leave; a cold start always
+opens in viewing mode.
 
 > The code is a UI convenience that keeps edit controls out of the way. It is **not**
 > authentication, it is visible in the source, and it protects nothing. It does not grant any
 > access to the official WEBTOP system.
 
-To edit a lesson, tap it (or an empty "+ הוספת שיעור" cell) while edit mode is on. The **כלים**
-screen holds presets, the profile/class name, backup and import, and resets.
+To edit a lesson, tap it (or an empty "+ הוספת שיעור" cell) while edit mode is on. In local mode
+the **כלים** screen (`#/tools`) holds presets, the profile/class name, backup and import, and
+resets. In account mode those belong to the administrator.
 
 ### Where your data lives (read this)
+
+In account mode the server holds the data and the device keeps a cached copy for offline use;
+see [docs/supabase-setup.md](docs/supabase-setup.md) for how sessions persist. In local mode:
 
 - Everything is stored in the browser's **localStorage** for this origin, with a versioned and
   validated envelope per data area.
@@ -111,7 +155,10 @@ Keep your real data in a backup JSON that is **never committed**:
 ## Deployment (GitHub Pages)
 
 `.github/workflows/deploy.yml` runs **typecheck → lint → unit tests → build → Playwright e2e**
-on every pull request and on pushes to `main`. On `main` it then deploys `dist/` to GitHub Pages.
+on every pull request and on pushes to `main`. A second job starts the local Supabase-equivalent
+stack and runs the backend suite and the account-mode e2e tests. On `main` it then deploys to
+GitHub Pages, built with the repository variables `VITE_SUPABASE_URL` and
+`VITE_SUPABASE_ANON_KEY` when they are set (account mode), or without them (local mode).
 
 One-time setup (repository owner):
 
@@ -142,8 +189,9 @@ the URL hash (`#/schedule/events`), so deep links work on Pages without server r
 
 ## Architecture
 
-React 19 + TypeScript (strict) + Vite 7, with zustand for state and zod for validation. There is
-no backend, no router library and no icon package at runtime.
+React 19 + TypeScript (strict) + Vite 7, with zustand for state and zod for validation. No router
+library and no icon package at runtime. The backend (account mode) is Supabase; its client, the
+login gate and the admin panel are code-split and never downloaded by a local-mode build.
 
 ```
 src/
@@ -159,12 +207,20 @@ src/
 │   │                    hooks/ (swipe, scroll), domain/ (pure: ops, days, periods, drafts, ICS),
 │   │                    timetableActions (undoable use-cases), view store
 │   ├── presets/         Preset picker/manager/form + pure preset↔lesson rules + actions
-│   ├── admin/           7-tap detector, demo-code check, edit-mode store, admin screen,
-│   │                    import/export & reset use-cases
+│   ├── admin/           7-tap detector, demo-code check, edit-mode store and capabilities,
+│   │                    local tools screen, import/export & reset use-cases
+│   ├── account/         Account mode: login screen and gate, session runtime (validation,
+│   │                    heartbeat, logout), timetable sync, bundle schema/mapping, account UI
+│   ├── adminPanel/      #/admin: api/ (typed Supabase calls), domain/ (pure rules: filters,
+│   │                    crop geometry, schedule model, validation, errors), state/ (cached
+│   │                    lists), components/ (users, sessions, presets, templates, schedule
+│   │                    grid, content, shared)
 │   ├── notices/ events/ Tabs, editors, pure sort/filter/group rules, actions
 │   ├── home/ settings/ placeholders/
 ├── schemas/             zod schemas: the single source of truth for persisted & imported data
+├── config/              Backend configuration (build-time Supabase URL/key → account mode)
 ├── services/
+│   ├── supabase/        Student/admin clients (separate auth storage) and error classification
 │   ├── storage/         KeyValueStore abstraction, versioned envelopes, migrations, quarantine
 │   ├── backup/          Backup file creation/parsing (all-or-nothing validation)
 │   ├── calendar/        RFC 5545 writer
@@ -176,9 +232,15 @@ src/
 ├── styles/              tokens.css (all colours/sizes/typography), tokens.ts, fonts, globals
 ├── data/                Default periods, presets, fictional example timetable
 └── utils/               Dates, Hebrew calendar numerals, time, colour mixing, ids
-tests/unit/              Vitest
-tests/e2e/               Playwright
+tests/unit/              Vitest (app domain rules)
+tests/functions/         Vitest (Edge Function handlers and access-code rules, with fakes)
+tests/backend/           Vitest against the local stack (database, RLS, functions)
+tests/e2e/               Playwright, local mode
+tests/e2e-account/       Playwright, account mode against the local stack
+supabase/                migrations/, functions/ (student-login, admin-access-code, _shared), config.toml
+scripts/local-stack/     Local Supabase-equivalent stack used by tests and CI
 docs/visual-spec.md      UI inventory, measurements, colours, deviations
+docs/supabase-setup.md   Backend setup, session model, local stack
 ```
 
 Design rules followed:
@@ -223,8 +285,24 @@ day must have exactly one cell per period: a lesson object or `null` for an empt
 - Visual: screenshots at the reference geometry were compared frame-by-frame with the
   recording. See `docs/visual-spec.md`.
 
+- Account mode:
+  - **Backend** (Vitest + the real Postgres/Auth/PostgREST/Deno stack): 12 concurrent logins
+    with one code → exactly one success; device B rejected until A logs out; no release on
+    inactivity; refresh-token rotation; force disconnect, revoked/replaced codes and disabled
+    accounts end access and revoke refresh tokens; rate limiting per IP; hashes only; student
+    isolation; blocked direct writes; storage policies; admin-only code issuance and RPCs;
+    templates vs customised timetables.
+  - **E2E** (Playwright against the stack): admin sign-in and non-admin rejection; create a
+    student, upload and crop a picture, weak custom code opt-in, show-once codes and
+    replacement; subject assignment and per-student timetable editing; template building and
+    the customised-timetable confirmation; presets CRUD/archive; sessions dashboard force
+    disconnect; student sign-in, persistence across reloads and token expiry, second device
+    rejected, simultaneous sign-ins (exactly one wins), sign-out on disconnect/revoke/disable,
+    restricted edit mode saved to the server, and the edit code never opening the admin panel.
+
 Not covered automatically: real iOS Safari/WebKit (CI uses Chromium), "Add to Home Screen"
-itself, and iOS launch images. Check those on a device.
+itself, iOS launch images, and a hosted Supabase project (the tests use the local stack).
+Check those on a device and after setting up the project.
 
 ## Third-party notices
 

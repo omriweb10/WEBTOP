@@ -20,7 +20,11 @@ alter table public.notifications enable row level security;
 revoke all on all tables in schema public from anon, authenticated;
 
 grant select on public.admins to authenticated;
-grant select, insert, update on public.profiles to authenticated;
+grant select on public.profiles to authenticated;
+-- Status changes go through admin_set_profile_status (which also ends sessions) and the
+-- link to the auth user is managed by the server only, so neither column is writable.
+grant insert (display_name, class_name, school_name, bio) on public.profiles to authenticated;
+grant update (display_name, class_name, school_name, bio, avatar_path) on public.profiles to authenticated;
 -- code_hash is never readable through the API, not even by admins.
 grant select (id, profile_id, code_hint, strength_bits, status, created_at, revoked_at, last_used_at)
   on public.access_codes to authenticated;

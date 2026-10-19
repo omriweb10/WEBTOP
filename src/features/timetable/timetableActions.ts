@@ -1,7 +1,8 @@
 /**
  * Timetable use-cases invoked by the UI. Each action applies a pure domain operation to
  * the persisted store and records an undo snapshot, so destructive edits can be
- * reverted from the confirmation toast.
+ * reverted from the confirmation toast. In account mode a registered listener saves
+ * every change (including undo) to the server.
  */
 import type { Lesson, Timetable } from '../../schemas/timetable';
 import { useTimetableStore } from '../../store/dataStores';
@@ -18,6 +19,17 @@ import {
 
 const MAX_UNDO = 20;
 const undoStack: Timetable[] = [];
+let changeListener: (() => void) | null = null;
+
+/** Registers the listener called after every user change (account-mode server sync). */
+export function setTimetableChangeListener(listener: (() => void) | null): void {
+  changeListener = listener;
+}
+
+/** Forgets undo history (when a different account's timetable is loaded). */
+export function clearTimetableHistory(): void {
+  undoStack.length = 0;
+}
 
 /** Applies a pure transformation, recording the previous state for undo when it changed. */
 function commit(transform: (timetable: Timetable) => Timetable): boolean {
@@ -27,6 +39,7 @@ function commit(transform: (timetable: Timetable) => Timetable): boolean {
   undoStack.push(before);
   if (undoStack.length > MAX_UNDO) undoStack.shift();
   useTimetableStore.getState().set(after);
+  changeListener?.();
   return true;
 }
 
@@ -35,6 +48,7 @@ export function undoTimetableChange(): boolean {
   const previous = undoStack.pop();
   if (!previous) return false;
   useTimetableStore.getState().set(previous);
+  changeListener?.();
   return true;
 }
 
@@ -73,5 +87,6 @@ export const timetableActions = {
     const before = useTimetableStore.getState().value;
     undoStack.push(before);
     useTimetableStore.getState().reset();
+    changeListener?.();
   },
 };

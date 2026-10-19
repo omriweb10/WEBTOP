@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { ScrollTopButton } from '../../../components/ui/ScrollTopButton';
 import { UnderlineSelect } from '../../../components/ui/UnderlineSelect';
+import { accountMode } from '../../../config/backend';
 import { useProfileStore, useTimetableStore } from '../../../store/dataStores';
 import { useIsEditing } from '../../admin/editModeStore';
 import { adjacentDay } from '../domain/days';
@@ -8,6 +9,7 @@ import type { Slot } from '../domain/timetableOps';
 import { useScrolledPast } from '../hooks/useScrolledPast';
 import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
 import { useTimetableViewStore } from '../timetableViewStore';
+import { AssignedLessonEditor } from './AssignedLessonEditor';
 import { ChangeAlert } from './ChangeAlert';
 import { DaySelector } from './DaySelector';
 import { LessonEditor } from './LessonEditor';
@@ -60,9 +62,13 @@ export function TimetableTab() {
         </div>
       </div>
       <ScrollTopButton visible={scrolled} onClick={() => scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' })} />
-      {editing && editSlot && (
-        <LessonEditor key={`${editSlot.day}-${editSlot.index}`} slot={editSlot} onClose={() => setEditSlot(null)} />
-      )}
+      {editing &&
+        editSlot &&
+        (accountMode ? (
+          <AssignedLessonEditor key={`${editSlot.day}-${editSlot.index}`} slot={editSlot} onClose={() => setEditSlot(null)} />
+        ) : (
+          <LessonEditor key={`${editSlot.day}-${editSlot.index}`} slot={editSlot} onClose={() => setEditSlot(null)} />
+        ))}
     </>
   );
 }

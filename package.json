@@ -17,6 +17,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "test:e2e:account": "playwright test --config playwright.account.config.ts",
     "test:backend": "vitest run --config vitest.backend.config.ts",
     "stack": "node scripts/local-stack/start.mjs",
     "check": "npm run typecheck && npm run lint && npm run test && npm run build",

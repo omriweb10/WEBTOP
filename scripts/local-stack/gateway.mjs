@@ -90,6 +90,28 @@ function signDownload(bucket, name, expiresIn) {
   return `${payload}.${createHmac('sha256', JWT_SECRET).update(payload).digest('base64url')}`;
 }
 
+/**
+ * The uploaded file from a raw or multipart body. supabase-js sends Blob/File uploads as
+ * multipart/form-data (one part per field; the file part carries its own Content-Type).
+ */
+function uploadedFile(body, contentType) {
+  const boundary = /^multipart\/form-data;.*boundary=("?)([^";]+)\1/i.exec(contentType)?.[2];
+  if (!boundary) return { bytes: body, type: contentType.split(';')[0].trim() };
+  const delimiter = Buffer.from(`--${boundary}`);
+  let start = body.indexOf(delimiter);
+  while (start !== -1) {
+    const next = body.indexOf(delimiter, start + delimiter.length);
+    if (next === -1) break;
+    const part = body.subarray(start + delimiter.length + 2, next - 2);
+    const split = part.indexOf('\r\n\r\n');
+    const headers = part.subarray(0, split).toString();
+    const type = /content-type:\s*([^\r\n;]+)/i.exec(headers)?.[1];
+    if (type) return { bytes: part.subarray(split + 4), type: type.trim() };
+    start = next;
+  }
+  return { bytes: Buffer.alloc(0), type: 'application/octet-stream' };
+}
+
 /** Storage API subset used by the app: upload, remove, sign, download. */
 async function handleStorage(req, res, path) {
   const claims = requestClaims(req);
@@ -108,6 +130,24 @@ async function handleStorage(req, res, path) {
     }
     if (!claims) return sendJson(res, 403, { statusCode: '403', error: 'Unauthorized', message: 'invalid jwt' });
 
+    if (req.method === 'POST' && (match = /^\/object\/sign\/([^/]+)$/.exec(path))) {
+      const bucket = match[1];
+      const { expiresIn = 3600, paths = [] } = JSON.parse((await readBody(req)).toString() || '{}');
+      const found = await asCaller(claims, (c) =>
+        c.query('select name from storage.objects where bucket_id = $1 and name = any($2)', [bucket, paths]),
+      );
+      const visible = new Set(found.rows.map((r) => r.name));
+      return sendJson(
+        res,
+        200,
+        paths.map((name) =>
+          visible.has(name)
+            ? { error: null, path: name, signedURL: `/object/sign/${bucket}/${encodeURI(name)}?token=${signDownload(bucket, name, expiresIn)}` }
+            : { error: 'Either the object does not exist or you do not have access to it', path: name, signedURL: null },
+        ),
+      );
+    }
+
     if (req.method === 'POST' && (match = /^\/object\/sign\/([^/]+)\/(.+)$/.exec(path))) {
       const [bucket, name] = [match[1], decodeURIComponent(match[2])];
       const { expiresIn = 3600 } = JSON.parse((await readBody(req)).toString() || '{}');
@@ -120,8 +160,7 @@ async function handleStorage(req, res, path) {
 
     if ((req.method === 'POST' || req.method === 'PUT') && (match = /^\/object\/([^/]+)\/(.+)$/.exec(path))) {
       const [bucket, name] = [match[1], decodeURIComponent(match[2])];
-      const bytes = await readBody(req);
-      const type = (req.headers['content-type'] ?? 'application/octet-stream').split(';')[0];
+      const { bytes, type } = uploadedFile(await readBody(req), req.headers['content-type'] ?? 'application/octet-stream');
       const { rows } = await pool.query('select file_size_limit, allowed_mime_types from storage.buckets where id = $1', [bucket]);
       const bucketRow = rows[0];
       if (!bucketRow) return sendJson(res, 400, { statusCode: '404', error: 'Bucket not found' });
@@ -163,7 +202,9 @@ function proxy(req, res, port, path) {
   const headers = { ...req.headers, host: `127.0.0.1:${port}` };
   headers['x-forwarded-for'] ??= req.socket.remoteAddress ?? '127.0.0.1';
   const upstream = http.request({ host: '127.0.0.1', port, path, method: req.method, headers }, (up) => {
-    res.writeHead(up.statusCode ?? 502, { ...up.headers, ...CORS });
+    // Upstream services send their own CORS headers; keep exactly one set (browsers reject duplicates).
+    const headers = Object.fromEntries(Object.entries(up.headers).filter(([name]) => !name.startsWith('access-control-')));
+    res.writeHead(up.statusCode ?? 502, { ...headers, ...CORS });
     up.pipe(res);
   });
   upstream.on('error', (error) => sendJson(res, 502, { error: 'bad_gateway', message: error.message }));

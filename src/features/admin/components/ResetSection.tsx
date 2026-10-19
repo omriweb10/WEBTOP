@@ -2,7 +2,7 @@ import { Button } from '../../../components/ui/Button';
 import { confirm } from '../../../components/ui/confirmStore';
 import { toast } from '../../../store/uiStore';
 import { RESET_LABELS, resetData, type ResetTarget } from '../dataActions';
-import styles from './AdminScreen.module.css';
+import styles from './LocalToolsScreen.module.css';
 
 const TARGETS: readonly ResetTarget[] = ['timetable', 'presets', 'content', 'settings', 'everything'];
 

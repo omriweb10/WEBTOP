@@ -3,8 +3,10 @@ import { navigate } from '../../../app/router';
 import { ScreenFrame } from '../../../components/layout/ScreenFrame';
 import { Button } from '../../../components/ui/Button';
 import { SectionCard } from '../../../components/ui/SectionCard';
+import { accountMode } from '../../../config/backend';
 import { checkForUpdate, usePwaStore } from '../../../services/pwa/serviceWorkerClient';
 import { toast } from '../../../store/uiStore';
+import { AccountSection } from '../../account/components/AccountSection';
 import { useEditModeStore } from '../../admin/editModeStore';
 import { StorageNotice } from './StorageNotice';
 import styles from './SettingsScreen.module.css';
@@ -33,17 +35,26 @@ export function SettingsScreen() {
   return (
     <ScreenFrame title="הגדרות ואודות">
       <div className={styles.scroll}>
+        {accountMode && <AccountSection />}
         <SectionCard id="about" title="אודות">
           <div className={styles.body}>
             <p className={styles.disclaimer}>
               <strong>פרויקט אישי לא רשמי.</strong> האפליקציה בהשראת ממשק WEBTOP אך אינה קשורה ל‑WEBTOP, ליצרנית שלה, למשרד
               החינוך או לבית ספר כלשהו, ואינה מייצגת אותם.
             </p>
-            <ul className={styles.facts}>
-              <li>אין התחברות, אין איסוף סיסמאות ואין שימוש בשרתים או בממשקים של WEBTOP.</li>
-              <li>כל הנתונים (מערכת, הודעות, אירועים) מוזנים ונשמרים מקומית במכשיר בלבד.</li>
-              <li>זו אפליקציית רשת (PWA) שמותקנת דרך „הוספה למסך הבית” — לא אפליקציה חתומה מה‑App Store.</li>
-            </ul>
+            {accountMode ? (
+              <ul className={styles.facts}>
+                <li>הכניסה היא בקוד גישה אישי שמנפיק מנהל האפליקציה — לא בסיסמה של WEBTOP, ואין שימוש בשרתים של WEBTOP.</li>
+                <li>מערכת השעות, ההודעות והאירועים נשמרים בשרת של האפליקציה (Supabase) ומוצגים רק לך.</li>
+                <li>זו אפליקציית רשת (PWA) שמותקנת דרך „הוספה למסך הבית” — לא אפליקציה חתומה מה‑App Store.</li>
+              </ul>
+            ) : (
+              <ul className={styles.facts}>
+                <li>אין התחברות, אין איסוף סיסמאות ואין שימוש בשרתים או בממשקים של WEBTOP.</li>
+                <li>כל הנתונים (מערכת, הודעות, אירועים) מוזנים ונשמרים מקומית במכשיר בלבד.</li>
+                <li>זו אפליקציית רשת (PWA) שמותקנת דרך „הוספה למסך הבית” — לא אפליקציה חתומה מה‑App Store.</li>
+              </ul>
+            )}
           </div>
         </SectionCard>
 
@@ -65,19 +76,23 @@ export function SettingsScreen() {
           </div>
         </SectionCard>
 
-        <SectionCard id="storage" title="שמירת נתונים">
-          <div className={styles.body}>
-            <StorageNotice />
-          </div>
-        </SectionCard>
+        {!accountMode && (
+          <SectionCard id="storage" title="שמירת נתונים">
+            <div className={styles.body}>
+              <StorageNotice />
+            </div>
+          </SectionCard>
+        )}
 
         {editing && (
-          <SectionCard id="edit" title="מצב עריכה מקומי">
+          <SectionCard id="edit" title={accountMode ? 'עריכת המערכת שלי' : 'מצב עריכה מקומי'}>
             <div className={styles.body}>
               <div className={styles.row}>
-                <Button variant="primary" icon="edit" onClick={() => navigate({ name: 'admin' })}>
-                  כלי עריכה
-                </Button>
+                {!accountMode && (
+                  <Button variant="primary" icon="edit" onClick={() => navigate({ name: 'tools' })}>
+                    כלי עריכה
+                  </Button>
+                )}
                 <Button
                   icon="lock"
                   onClick={() => {

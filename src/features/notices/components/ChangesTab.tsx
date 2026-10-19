@@ -7,7 +7,7 @@ import { UnderlineSelect } from '../../../components/ui/UnderlineSelect';
 import type { EventKind, Notice, NoticeCategory, SchoolEvent } from '../../../schemas/content';
 import { useEventsStore, useNoticesStore, useProfileStore } from '../../../store/dataStores';
 import { formatIsoDmy, toIsoDate } from '../../../utils/dates';
-import { useIsEditing } from '../../admin/editModeStore';
+import { useCanEditLocalContent } from '../../admin/editCapabilities';
 import { EventEditor } from '../../events/components/EventEditor';
 import { useEventGroups } from '../../events/hooks/useEventGroups';
 import { upcomingEvents } from '../../events/domain/eventOps';
@@ -33,7 +33,7 @@ export function ChangesTab() {
   const notices = useNoticesStore((state) => state.value);
   const events = useEventsStore((state) => state.value);
   const groups = useEventGroups();
-  const editing = useIsEditing();
+  const editing = useCanEditLocalContent();
   const [noticeTarget, setNoticeTarget] = useState<{ notice: Notice } | { category: NoticeCategory } | null>(null);
   const [eventTarget, setEventTarget] = useState<{ event: SchoolEvent } | { kind: EventKind } | null>(null);
   const upcoming = useMemo(() => upcomingEvents(events, toIsoDate(new Date())), [events]);

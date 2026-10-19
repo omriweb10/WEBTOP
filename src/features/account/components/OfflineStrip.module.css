@@ -1,0 +1,30 @@
+.strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  min-height: 38px;
+  padding: 4px 12px 4px 8px;
+  background: #2a2131;
+  border-bottom: 1px solid #47354f;
+  color: #e8d3f0;
+}
+
+.text {
+  flex: 1;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: 1.35;
+}
+
+.button {
+  flex: none;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid rgb(232 211 240 / 0.45);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}

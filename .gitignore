@@ -1,12 +1,14 @@
 # Dependencies & build output
 node_modules/
 dist/
+dist-account/
 coverage/
 *.tsbuildinfo
 
 # Test artifacts
 test-results/
 playwright-report/
+playwright-report-account/
 blob-report/
 
 # Private personal data — NEVER commit (real names, schedule, school)

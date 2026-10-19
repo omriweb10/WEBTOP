@@ -28,7 +28,18 @@ test('signs in with a code, shows only the student’s data and stays signed in 
   ]);
 
   await signInStudent(page, ` ${code.toLowerCase()} `);
-  await expect(page.getByRole('button', { name: 'החשבון של מאיה כץ' })).toBeVisible();
+  // The app bar is the original one: menu, title, export and alerts at the far left — no picture.
+  const appBar = page.getByRole('banner');
+  await expect(appBar.getByRole('button')).toHaveCount(3);
+  await expect(appBar.locator('img')).toHaveCount(0);
+  await expect(appBar).not.toContainText('מכ');
+  const barBox = await appBar.boundingBox();
+  const alertsBox = await appBar.getByRole('button', { name: /התראות שינויים/ }).boundingBox();
+  expect((alertsBox?.x ?? 999) - (barBox?.x ?? 0)).toBeLessThanOrEqual(20);
+  // The student's name and picture stay in the side menu.
+  await appBar.getByRole('button', { name: 'פתיחת תפריט' }).click();
+  await expect(page.getByRole('dialog', { name: 'תפריט ראשי' })).toContainText('מאיה כץ');
+  await page.keyboard.press('Escape');
   await page.getByRole('radio', { name: 'יום ראשון', exact: true }).click();
   await expect(dayTable(page)).toContainText('מתמטיקה');
 

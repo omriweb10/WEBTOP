@@ -85,7 +85,7 @@ export function AvatarPanel({ user, avatarUrl }: { user: UserOverview; avatarUrl
           <figcaption>מרובעת</figcaption>
         </figure>
       </div>
-      <p className={styles.help}>JPG,‏ PNG או WebP. התמונה נחתכת לריבוע, מוקטנת ל‑512×512 ונשמרת באחסון פרטי. מוצגת בכותרת האפליקציה ובתפריט של התלמיד/ה.</p>
+      <p className={styles.help}>JPG,‏ PNG או WebP. התמונה נחתכת לריבוע, מוקטנת ל‑512×512 ונשמרת באחסון פרטי. מוצגת בתפריט הצד ובמסך ההגדרות של התלמיד/ה.</p>
       <input ref={input} type="file" accept={ACCEPTED_AVATAR_TYPES.join(',')} hidden onChange={(event) => void onFile(event)} />
       <div className={styles.actions}>
         <Button icon="photoCamera" variant="primary" onClick={() => input.current?.click()}>

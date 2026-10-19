@@ -83,6 +83,7 @@ async function main() {
   stopCluster();
   initCluster();
   startCluster();
+  psqlFile(path.join(ROOT, 'scripts/local-stack/bootstrap-roles.sql'));
   psqlFile(path.join(ROOT, 'scripts/local-stack/bootstrap.sql'));
 
   console.info('[stack] Supabase Auth…');

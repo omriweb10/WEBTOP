@@ -11,7 +11,7 @@ import { getTemplateLessons, saveTemplate } from '../../api/templatesApi';
 import type { TemplateRow } from '../../api/types';
 import { errorMessage } from '../../domain/adminErrors';
 import { presetMap, presetRowToLocal, rowsFromTimetable, timetableFromRows, withPeriods } from '../../domain/scheduleModel';
-import { usePresets, useTemplates } from '../../state/resources';
+import { useLibraryPresets, useTemplates } from '../../state/resources';
 import { PeriodsEditor } from '../schedule/PeriodsEditor';
 import { WeekGrid } from '../schedule/WeekGrid';
 import { Page, Panel } from '../shared/Page';
@@ -27,7 +27,7 @@ interface TemplateEditorProps {
 
 /** Visual editor for a reusable weekly template: name, bell schedule and lessons. */
 export function TemplateEditor({ template, onDone }: TemplateEditorProps) {
-  const { data: presetRows, load: loadPresets } = usePresets();
+  const { data: presetRows, load: loadPresets } = useLibraryPresets();
   const [name, setName] = useState(template?.name ?? '');
   const [draft, setDraft] = useState<Timetable | null>(template ? null : createEmptyTimetable(DEFAULT_PERIODS));
   const [failure, setFailure] = useState<string | null>(null);

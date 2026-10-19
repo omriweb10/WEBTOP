@@ -39,6 +39,52 @@ This applies `supabase/migrations/*.sql` in order:
 | `…120500_rls` | RLS on every table, minimal grants, column-level protection of `code_hash`, `status` and `auth_user_id` |
 | `…120600`–`…120800` | Lesson validation, student RPCs, admin RPCs and admin overview views |
 | `…120900_storage` | Private `avatars` bucket (2 MB, JPEG/PNG/WebP) and its policies |
+| `…130000_user_owned_presets` | Per-user subjects: every preset belongs to one student (or to the admin-only library), lessons may only use their own student's presets, migration of existing data (see below) |
+
+### Upgrading an existing project to per-user subjects
+
+Projects created before `20261019130000_user_owned_presets.sql` share one list of subjects
+between all students. Upgrade them with the same command, which applies only the migrations the
+project does not have yet:
+
+```bash
+npx supabase link --project-ref <your-project-ref>   # once per machine
+npx supabase db dump --data-only -f backup.sql       # optional safety copy of the data (keep it private)
+npx supabase db push --dry-run                       # lists the migrations it would apply
+npx supabase db push                                 # applies them
+```
+
+Apply it when you merge the pull request, so the admin panel and the database change together:
+the new admin panel needs the new functions, and the old one cannot manage per-user subjects.
+Students' apps keep working during the switch.
+
+What the migration does with existing data (nothing is deleted):
+
+- Every student gets their **own copy** of each subject that was assigned to them or placed in
+  their timetable, with the same name, teacher, room, colour and notes. Their lessons are moved
+  to those copies, so every timetable looks exactly as before.
+- Copies of subjects that were assigned and active stay selectable; copies of subjects that were
+  only placed (not assigned) or archived are kept but hidden from the picker, as before.
+- The shared subjects stay as the **library** (מאגר), unchanged, together with the templates
+  built from them. No student can see the library.
+- The old assignment table (`profile_presets`) and its two functions are removed.
+
+To check the result in the SQL Editor (both counts should be 0):
+
+```sql
+-- lessons that use a subject not owned by their student
+select count(*) from public.lessons l join public.subject_presets sp on sp.id = l.preset_id
+ where sp.profile_id is distinct from l.profile_id;
+-- templates that use a student's subject
+select count(*) from public.template_lessons tl join public.subject_presets sp on sp.id = tl.preset_id
+ where sp.profile_id is not null;
+```
+
+The same file is applied by `npm run stack` and covered by `tests/backend/migration.test.ts`,
+which upgrades a database filled with data in the old format and compares every timetable
+before and after. If `db push` stops with an error, it names the failing statement; restore
+from the backup (or the project's daily backup under Dashboard → Database → Backups) before
+retrying if part of the file was applied.
 
 ## 3. Auth settings (Dashboard → Authentication)
 
@@ -88,6 +134,23 @@ npx supabase functions deploy admin-access-code
 
 Admins sign in at `https://<user>.github.io/WEBTOP/#/admin`. Student access codes never work
 there, and the hidden 7-tap edit gesture never grants admin access.
+
+## Subjects: per user, never shared
+
+- Each student's subjects are managed on their user page: **Users → user → מקצועות** (add, edit,
+  duplicate, hide, remove; add several from the library or copy all/selected from another
+  user). In edit mode a student sees only these subjects; picking one fills in its teacher,
+  room and colour.
+- Every subject row has an owner (`subject_presets.profile_id`). Row Level Security lets a
+  student read only their own; only admins can create, change or remove subjects; the owner
+  column can never be changed. A composite foreign key makes the database reject a lesson that
+  uses another student's subject, whoever sends it.
+- Copying (from the library, from another user, or by applying a template) always creates new,
+  independent rows. Nothing links them afterwards, so a change for one user never reaches
+  another.
+- Removing a subject that is still placed requires a choice — replace it in those lessons,
+  empty those periods, or only hide it — and the server refuses otherwise
+  (`admin_remove_preset`), so lessons are never deleted silently.
 
 ## 6. Build and deploy the site
 

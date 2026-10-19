@@ -1,6 +1,6 @@
 /** Admin capabilities: users, codes, presets, templates and independent timetables. */
 import { describe, expect, it } from 'vitest';
-import { adminClient, callFunction, createStudent, loginStudent, presetIds, sql, stackAvailable, uniqueDigits } from './helpers';
+import { adminClient, callFunction, createStudent, createUserPreset, loginStudent, presetIds, sql, stackAvailable, uniqueDigits } from './helpers';
 
 /** The admin's current access token (for Edge Function calls). */
 async function adminToken(): Promise<string | undefined> {
@@ -41,19 +41,37 @@ describe.skipIf(!stackAvailable)('admin operations', () => {
     expect(dup.body.error).toBe('code_taken');
   });
 
-  it('manages presets; presets in use cannot be hard-deleted', async () => {
+  it('manages library presets; a library preset used by a template cannot be removed', async () => {
     const admin = await adminClient();
     const created = await admin.from('subject_presets').insert({ name: 'רובוטיקה', teacher: 'מורה', room: '12', color: '#259e3b' }).select().single();
     expect(created.error).toBeNull();
+    expect(created.data.profile_id).toBeNull();
     expect((await admin.from('subject_presets').insert({ name: 'צבע שגוי', color: 'green' })).error).not.toBeNull();
-    const { profileId } = await createStudent();
-    await admin.rpc('admin_save_user_lessons', { p_profile_id: profileId, p_changes: [{ day: 'wed', period_index: 1, preset_id: created.data.id }] });
-    expect((await admin.from('subject_presets').delete().eq('id', created.data.id)).error).not.toBeNull();
+    const template = await admin.rpc('admin_save_template', {
+      p_template_id: null,
+      p_name: 'עם רובוטיקה',
+      p_periods: [{ number: 1, start: '8:00', end: '8:45' }],
+      p_lessons: [{ day: 'wed', period_index: 0, preset_id: created.data.id }],
+    });
+    expect(template.error).toBeNull();
+    // Direct deletes are not allowed; the RPC refuses while a template uses it.
+    await admin.from('subject_presets').delete().eq('id', created.data.id);
+    expect(await sql('select 1 from public.subject_presets where id = $1', [created.data.id])).toHaveLength(1);
+    expect((await admin.rpc('admin_remove_preset', { p_preset_id: created.data.id })).error?.message).toMatch(/preset_in_template/);
     const archived = await admin.from('subject_presets').update({ archived_at: new Date().toISOString() }).eq('id', created.data.id).select().single();
     expect(archived.error).toBeNull();
-    // Admin placing a preset also makes it available to the student.
-    const [link] = await sql('select 1 as ok from public.profile_presets where profile_id = $1 and preset_id = $2', [profileId, created.data.id]);
-    expect(link?.ok).toBe(1);
+    // The owner of a preset can never be changed.
+    expect((await admin.from('subject_presets').update({ profile_id: (await createStudent()).profileId }).eq('id', created.data.id)).error).not.toBeNull();
+    // A template can only use library presets, never a student's own.
+    const { profileId } = await createStudent();
+    const own = await createUserPreset(profileId, { name: 'פרטי' });
+    const bad = await admin.rpc('admin_save_template', {
+      p_template_id: null,
+      p_name: 'שגויה',
+      p_periods: [{ number: 1, start: '8:00', end: '8:45' }],
+      p_lessons: [{ day: 'sun', period_index: 0, preset_id: own }],
+    });
+    expect(bad.error?.message).toMatch(/preset_not_in_library/);
   });
 
   it('saves, duplicates and assigns templates, respecting customised timetables', async () => {
@@ -81,6 +99,19 @@ describe.skipIf(!stackAvailable)('admin operations', () => {
     const b = await createStudent();
     const first = await admin.rpc('admin_assign_template', { p_template_id: templateId, p_profile_ids: [a.profileId, b.profileId], p_overwrite_customized: false });
     expect(first.data.assigned).toHaveLength(2);
+    // Each student received their own copies of the template's subjects.
+    const owned = async (id: string) =>
+      sql<{ id: string; library_preset_id: string }>('select id, library_preset_id from public.subject_presets where profile_id = $1 order by name', [id]);
+    const aPresets = await owned(a.profileId);
+    const bPresets = await owned(b.profileId);
+    expect(aPresets.map((p) => p.library_preset_id).sort()).toEqual([p1, p2].sort());
+    expect(bPresets).toHaveLength(2);
+    expect(aPresets.some((p) => bPresets.some((q) => q.id === p.id))).toBe(false);
+    const [mismatched] = await sql<{ n: number }>(
+      'select count(*)::int as n from public.lessons l join public.subject_presets sp on sp.id = l.preset_id where l.profile_id = any($1) and sp.profile_id <> l.profile_id',
+      [[a.profileId, b.profileId]],
+    );
+    expect(mismatched?.n).toBe(0);
 
     // Student A customises their own copy; B and the template stay unchanged.
     const { client } = await loginStudent(a.code);
@@ -99,15 +130,14 @@ describe.skipIf(!stackAvailable)('admin operations', () => {
     await admin.rpc('admin_assign_template', { p_template_id: templateId, p_profile_ids: [a.profileId], p_overwrite_customized: true });
     const [aAfterOverwrite] = await sql('select count(*)::int as n from public.lessons where profile_id = $1', [a.profileId]);
     expect(aAfterOverwrite?.n).toBe(2);
-    // Template presets became available to the students.
-    const [available] = await sql('select count(*)::int as n from public.profile_presets where profile_id = $1', [b.profileId]);
-    expect(available?.n).toBe(2);
+    // Re-applying reuses the student's existing copies instead of duplicating them.
+    expect(await owned(a.profileId)).toEqual(aPresets);
   });
 
   it('changes a student bell schedule and trims lessons beyond it', async () => {
     const admin = await adminClient();
-    const [p1] = await presetIds();
     const { profileId } = await createStudent();
+    const p1 = await createUserPreset(profileId, { name: 'ספרות' });
     await admin.rpc('admin_save_user_lessons', { p_profile_id: profileId, p_changes: [{ day: 'sun', period_index: 10, preset_id: p1 }, { day: 'sun', period_index: 0, preset_id: p1 }] });
     const result = await admin.rpc('admin_set_user_periods', { p_profile_id: profileId, p_periods: [{ number: 1, start: '8:00', end: '8:50' }] });
     expect(result.error).toBeNull();
@@ -118,6 +148,8 @@ describe.skipIf(!stackAvailable)('admin operations', () => {
   it('shows connected users in the overview and deletes users completely', async () => {
     const admin = await adminClient();
     const { profileId, code } = await createStudent({ display_name: 'למחיקה' });
+    const preset = await createUserPreset(profileId, { name: 'גאוגרפיה' });
+    await admin.rpc('admin_save_user_lessons', { p_profile_id: profileId, p_changes: [{ day: 'sun', period_index: 0, preset_id: preset }] });
     await loginStudent(code);
     const overview = await admin.from('admin_user_overview').select('*').eq('id', profileId).single();
     expect(overview.data.session_status).toBe('active');
@@ -128,5 +160,6 @@ describe.skipIf(!stackAvailable)('admin operations', () => {
     expect(await sql('select 1 from public.profiles where id = $1', [profileId])).toEqual([]);
     expect(await sql('select 1 from auth.users where id = $1', [authUser?.auth_user_id])).toEqual([]);
     expect(await sql('select 1 from public.access_codes where profile_id = $1', [profileId])).toEqual([]);
+    expect(await sql('select 1 from public.subject_presets where profile_id = $1', [profileId])).toEqual([]);
   });
 });

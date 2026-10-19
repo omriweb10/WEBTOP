@@ -3,7 +3,7 @@ import { expect, type Page } from '@playwright/test';
 import { deflateSync, crc32 } from 'node:zlib';
 import { env } from '../backend/helpers';
 
-export { adminClient, createStudent, env, sql, stackAvailable, uniqueDigits } from '../backend/helpers';
+export { adminClient, createStudent, createUserPreset, env, sql, stackAvailable, uniqueDigits } from '../backend/helpers';
 
 /** The on-screen day table (the print-only week table is excluded). */
 export function dayTable(page: Page) {

@@ -12,13 +12,15 @@ import styles from './presets.module.css';
 interface PresetEditorProps {
   title: string;
   initial: PresetFields;
+  /** Shown above the form, e.g. that the subject is already placed in lessons. */
+  warning?: string;
   /** Saves; resolves to an error message or null. */
   onSave: (fields: PresetFields) => Promise<string | null>;
   onClose: () => void;
 }
 
 /** Create/edit form for a subject preset with a live lesson-card preview. */
-export function PresetEditor({ title, initial, onSave, onClose }: PresetEditorProps) {
+export function PresetEditor({ title, initial, warning, onSave, onClose }: PresetEditorProps) {
   const [fields, setFields] = useState(initial);
   const [showErrors, setShowErrors] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -58,6 +60,7 @@ export function PresetEditor({ title, initial, onSave, onClose }: PresetEditorPr
         </>
       }
     >
+      {warning && <p className={styles.warning}>{warning}</p>}
       <div className={styles.preview}>
         <LessonCard
           lesson={{

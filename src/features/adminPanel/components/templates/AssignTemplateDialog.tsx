@@ -6,6 +6,7 @@ import { assignTemplate, previewAssignment } from '../../api/templatesApi';
 import type { TemplateRow } from '../../api/types';
 import { errorMessage } from '../../domain/adminErrors';
 import { useUsers } from '../../state/resources';
+import { reloadUserPresets } from '../../state/userPresets';
 import { LoadingView } from '../shared/StatusViews';
 import { UserPicker } from '../shared/UserPicker';
 import styles from './templates.module.css';
@@ -43,6 +44,7 @@ export function AssignTemplateDialog({ template, onClose }: { template: Template
     setBusy(true);
     try {
       const result = await assignTemplate(template.id, [...selected], overwrite);
+      reloadUserPresets(result.assigned);
       const skipped = result.skipped_customized.length;
       toast(`התבנית הוחלה על ${result.assigned.length} משתמשים${skipped ? `; ${skipped} עם מערכת מותאמת אישית נשארו ללא שינוי` : ''}.`, {
         tone: 'success',
@@ -100,7 +102,7 @@ export function AssignTemplateDialog({ template, onClose }: { template: Template
       {step.kind === 'pick' ? (
         users ? (
           <>
-            <p className={styles.note}>התבנית תועתק למערכת האישית של כל משתמש שנבחר, והמקצועות שבה יהיו זמינים לו. שינויים עתידיים בתבנית לא ישנו אותם אוטומטית.</p>
+            <p className={styles.note}>התבנית תועתק למערכת האישית של כל משתמש שנבחר, ומקצועות התבנית יתווספו לרשימת המקצועות האישית שלו כעותקים עצמאיים (עותק שכבר קיים אצלו משמש שוב). שינויים עתידיים בתבנית או במאגר לא ישנו אותם.</p>
             <UserPicker users={users} selected={selected} onChange={setSelected} />
           </>
         ) : (

@@ -11,9 +11,9 @@ import { AccessCodePanel } from './AccessCodePanel';
 import { AvatarPanel } from './AvatarPanel';
 import { ConnectionBadge } from './ConnectionBadge';
 import { UserDetailsPanel } from './UserDetailsPanel';
-import { UserPresetsPanel } from './UserPresetsPanel';
 import { UserSessionPanel } from './UserSessionPanel';
 import { UserTimetablePanel } from './UserTimetablePanel';
+import { UserSubjectsPanel } from './subjects/UserSubjectsPanel';
 import styles from './users.module.css';
 
 const TABS = [
@@ -94,7 +94,7 @@ export function UserDetail({ profileId }: { profileId: string }) {
         {tab === 'code' && <AccessCodePanel user={user} />}
         {tab === 'session' && <UserSessionPanel user={user} />}
         {tab === 'picture' && <AvatarPanel user={user} avatarUrl={avatarUrl} />}
-        {tab === 'presets' && <UserPresetsPanel profileId={user.id} />}
+        {tab === 'presets' && <UserSubjectsPanel user={user} />}
         {tab === 'timetable' && <UserTimetablePanel user={user} />}
       </div>
     </Page>

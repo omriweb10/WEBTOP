@@ -102,10 +102,25 @@ export async function loginStudent(code: string, ip = freshIp()): Promise<{ stat
   return { ...result, client };
 }
 
-/** First subject preset ids (seeded defaults). */
+/** Library preset ids (the seeded defaults, never visible to students), by name. */
 export async function presetIds(): Promise<string[]> {
-  const rows = await sql<{ id: string }>('select id from public.subject_presets order by name');
+  const rows = await sql<{ id: string }>('select id from public.subject_presets where profile_id is null order by name');
   return rows.map((r) => r.id);
+}
+
+/** Creates a preset in one student's own list (as the admin); returns its id. */
+export async function createUserPreset(
+  profileId: string,
+  fields: { name: string; teacher?: string; room?: string; color?: string },
+): Promise<string> {
+  const admin = await adminClient();
+  const { data, error } = await admin
+    .from('subject_presets')
+    .insert({ profile_id: profileId, color: '#1498fd', ...fields })
+    .select('id')
+    .single();
+  if (error) throw error;
+  return data.id as string;
 }
 
 /** A per-run unique suffix so fixed-shape custom codes never collide with earlier runs. */

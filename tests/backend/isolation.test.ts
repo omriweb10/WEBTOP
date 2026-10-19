@@ -1,9 +1,9 @@
 /** Authorization and data isolation: anon, students and admins see exactly what they may. */
 import { describe, expect, it } from 'vitest';
-import { adminClient, anonClient, callFunction, createStudent, env, loginStudent, presetIds, sql, stackAvailable } from './helpers';
+import { adminClient, anonClient, callFunction, createStudent, createUserPreset, env, loginStudent, presetIds, sql, stackAvailable } from './helpers';
 
 const TABLES = [
-  'admins', 'profiles', 'access_codes', 'user_sessions', 'subject_presets', 'profile_presets',
+  'admins', 'profiles', 'access_codes', 'user_sessions', 'subject_presets', 'admin_preset_overview',
   'schedule_templates', 'template_lessons', 'user_timetables', 'lessons', 'events', 'notifications',
 ];
 
@@ -20,13 +20,12 @@ describe.skipIf(!stackAvailable)('authorization and isolation', () => {
 
   it('keeps students isolated from each other', async () => {
     const admin = await adminClient();
-    const [math, english] = await presetIds();
     const a = await createStudent({ display_name: 'תלמיד א' });
     const b = await createStudent({ display_name: 'תלמיד ב' });
+    const english = await createUserPreset(b.profileId, { name: 'אנגלית' });
     await admin.rpc('admin_save_user_lessons', { p_profile_id: b.profileId, p_changes: [{ day: 'sun', period_index: 0, preset_id: english }] });
     await admin.from('events').insert({ profile_id: b.profileId, kind: 'exam', title: 'מבחן פרטי של ב', date: '2026-11-01' });
     await admin.from('events').insert({ profile_id: null, kind: 'event', title: 'טיול שכבתי', date: '2026-11-02' });
-    void math;
 
     const { client } = await loginStudent(a.code);
     const profiles = await client.from('profiles').select('id');
@@ -38,6 +37,7 @@ describe.skipIf(!stackAvailable)('authorization and isolation', () => {
     expect(titles).toContain('טיול שכבתי');
     expect(titles).not.toContain('מבחן פרטי של ב');
     expect(bundle.lessons).toEqual([]);
+    expect(bundle.presets).toEqual([]);
   });
 
   it('blocks direct student writes and admin/service functions', async () => {
@@ -59,26 +59,37 @@ describe.skipIf(!stackAvailable)('authorization and isolation', () => {
     expect((await admin.from('access_codes').select('id, code_hint').limit(1)).error).toBeNull();
   });
 
-  it('lets students save lessons only with presets assigned to them', async () => {
+  it('lets students save lessons only with their own presets', async () => {
     const admin = await adminClient();
-    const [assigned, notAssigned] = await presetIds();
     const { profileId, code } = await createStudent();
-    await admin.rpc('admin_set_profile_presets', { p_profile_id: profileId, p_preset_ids: [assigned] });
+    const other = await createStudent();
+    const assigned = await createUserPreset(profileId, { name: 'מתמטיקה' });
+    const notAssigned = await createUserPreset(other.profileId, { name: 'מתמטיקה' });
+    const [library] = await presetIds();
     const { client } = await loginStudent(code);
 
     const ok = await client.rpc('save_my_lessons', { p_changes: [{ day: 'mon', period_index: 2, preset_id: assigned }] });
     expect(ok.error).toBeNull();
     expect(ok.data).toEqual([{ day: 'mon', period_index: 2, preset_id: assigned }]);
 
+    // Another student's preset (even with the same name) and library presets are refused.
     const denied = await client.rpc('save_my_lessons', { p_changes: [{ day: 'mon', period_index: 3, preset_id: notAssigned }] });
     expect(denied.error?.message).toMatch(/preset_not_assigned/);
+    const fromLibrary = await client.rpc('save_my_lessons', { p_changes: [{ day: 'mon', period_index: 3, preset_id: library }] });
+    expect(fromLibrary.error?.message).toMatch(/preset_not_assigned/);
+    const missing = await client.rpc('save_my_lessons', { p_changes: [{ day: 'mon', period_index: 3, preset_id: crypto.randomUUID() }] });
+    expect(missing.error?.message).toMatch(/preset_not_assigned/);
     const badPeriod = await client.rpc('save_my_lessons', { p_changes: [{ day: 'mon', period_index: 13, preset_id: assigned }] });
     expect(badPeriod.error?.message).toMatch(/invalid_period/);
     const badDay = await client.rpc('save_my_lessons', { p_changes: [{ day: 'fri', period_index: 0, preset_id: assigned }] });
     expect(badDay.error?.message).toMatch(/invalid_day/);
 
-    // Moving an existing lesson keeps working even after the admin unassigns its preset.
-    await admin.rpc('admin_set_profile_presets', { p_profile_id: profileId, p_preset_ids: [] });
+    // Once the admin hides (archives) the preset it cannot be placed again, but a lesson
+    // that already uses it can still be moved.
+    await admin.from('subject_presets').update({ archived_at: new Date().toISOString() }).eq('id', assigned);
+    const placedAgain = await client.rpc('save_my_lessons', { p_changes: [{ day: 'wed', period_index: 0, preset_id: assigned }] });
+    expect(placedAgain.error).toBeNull();
+    await client.rpc('save_my_lessons', { p_changes: [{ day: 'wed', period_index: 0, preset_id: null }] });
     const moved = await client.rpc('save_my_lessons', {
       p_changes: [
         { day: 'mon', period_index: 2, preset_id: null },
@@ -87,15 +98,18 @@ describe.skipIf(!stackAvailable)('authorization and isolation', () => {
     });
     expect(moved.error).toBeNull();
     expect(moved.data).toEqual([{ day: 'tue', period_index: 0, preset_id: assigned }]);
+    await client.rpc('save_my_lessons', { p_changes: [{ day: 'tue', period_index: 0, preset_id: null }] });
+    const archivedNew = await client.rpc('save_my_lessons', { p_changes: [{ day: 'thu', period_index: 0, preset_id: assigned }] });
+    expect(archivedNew.error?.message).toMatch(/preset_unavailable/);
   });
 
   it('saves a student\'s edits only into their own timetable, and only while signed in', async () => {
     const admin = await adminClient();
-    const [preset] = await presetIds();
     const a = await createStudent();
     const b = await createStudent();
-    await admin.rpc('admin_set_profile_presets', { p_profile_id: a.profileId, p_preset_ids: [preset] });
-    await admin.rpc('admin_save_user_lessons', { p_profile_id: b.profileId, p_changes: [{ day: 'sun', period_index: 0, preset_id: preset }] });
+    const preset = await createUserPreset(a.profileId, { name: 'היסטוריה' });
+    const presetOfB = await createUserPreset(b.profileId, { name: 'היסטוריה' });
+    await admin.rpc('admin_save_user_lessons', { p_profile_id: b.profileId, p_changes: [{ day: 'sun', period_index: 0, preset_id: presetOfB }] });
     const { client } = await loginStudent(a.code);
     const lessonsOf = async (id: string) => sql('select day, period_index from public.lessons where profile_id = $1 order by day, period_index', [id]);
 

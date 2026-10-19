@@ -2,15 +2,17 @@ import { useEffect, useState } from 'react';
 import { Button } from '../../../../components/ui/Button';
 import { Modal } from '../../../../components/ui/Modal';
 import { toast } from '../../../../store/uiStore';
-import { addPresetToUsers } from '../../api/presetsApi';
+import { copyPresets } from '../../api/presetsApi';
 import type { PresetRow } from '../../api/types';
 import { errorMessage } from '../../domain/adminErrors';
 import { useUsers } from '../../state/resources';
+import { reloadUserPresets } from '../../state/userPresets';
 import { LoadingView } from '../shared/StatusViews';
 import { UserPicker } from '../shared/UserPicker';
+import styles from './presets.module.css';
 
-/** Makes one subject available to many students at once. */
-export function AssignPresetDialog({ preset, onClose }: { preset: PresetRow; onClose: () => void }) {
+/** Copies one library subject into many students' own lists (independent copies). */
+export function CopyToUsersDialog({ preset, onClose }: { preset: PresetRow; onClose: () => void }) {
   const { data: users, load } = useUsers();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
@@ -19,12 +21,13 @@ export function AssignPresetDialog({ preset, onClose }: { preset: PresetRow; onC
     void load();
   }, [load]);
 
-  /** Adds the preset to every selected student. */
-  const assign = async () => {
+  /** Creates a copy in every selected student's list. */
+  const copy = async () => {
     setBusy(true);
     try {
-      const added = await addPresetToUsers(preset.id, [...selected]);
-      toast(added > 0 ? `„${preset.name}” נוסף ל‑${added} משתמשים` : 'המקצוע כבר היה זמין לכל המשתמשים שנבחרו', { tone: 'success' });
+      const created = await copyPresets([preset.id], [...selected]);
+      reloadUserPresets([...selected]);
+      toast(`„${preset.name}” הועתק ל‑${created} משתמשים`, { tone: 'success' });
       onClose();
     } catch (error) {
       toast(errorMessage(error), { tone: 'error' });
@@ -36,12 +39,12 @@ export function AssignPresetDialog({ preset, onClose }: { preset: PresetRow; onC
   return (
     <Modal
       open
-      title={`הקצאת „${preset.name}”`}
+      title={`העתקת „${preset.name}” למשתמשים`}
       onClose={onClose}
       footer={
         <>
-          <Button variant="primary" disabled={busy || selected.size === 0} onClick={() => void assign()}>
-            הקצאה ל‑{selected.size} משתמשים
+          <Button variant="primary" disabled={busy || selected.size === 0} onClick={() => void copy()}>
+            העתקה ל‑{selected.size} משתמשים
           </Button>
           <Button variant="secondary" onClick={onClose}>
             ביטול
@@ -49,6 +52,10 @@ export function AssignPresetDialog({ preset, onClose }: { preset: PresetRow; onC
         </>
       }
     >
+      <p className={styles.note}>
+        כל משתמש שנבחר יקבל עותק עצמאי ברשימת המקצועות האישית שלו. אפשר לשנות אחר כך מורה, חדר וצבע לכל משתמש בנפרד; שינוי במאגר לא ישנה את
+        העותקים.
+      </p>
       {users ? <UserPicker users={users} selected={selected} onChange={setSelected} /> : <LoadingView />}
     </Modal>
   );

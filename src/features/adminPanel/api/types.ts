@@ -48,8 +48,13 @@ export interface SessionOverview {
   code_status: 'active' | 'revoked';
 }
 
+/** A subject preset with its usage (admin_preset_overview). */
 export interface PresetRow {
   id: string;
+  /** The student who owns it; null = the admin-only library used by templates. */
+  profile_id: string | null;
+  /** The library preset it was copied from (provenance only). */
+  library_preset_id: string | null;
   name: string;
   short_name: string;
   teacher: string;
@@ -59,6 +64,10 @@ export interface PresetRow {
   archived_at: string | null;
   created_at: string;
   updated_at: string;
+  /** Lessons in the owner's timetable that use it. */
+  lesson_count: number;
+  /** Template cells that use it (library presets only). */
+  template_lesson_count: number;
 }
 
 export type PresetFields = Pick<PresetRow, 'name' | 'short_name' | 'teacher' | 'room' | 'color' | 'notes'>;

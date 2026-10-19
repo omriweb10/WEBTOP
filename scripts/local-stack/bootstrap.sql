@@ -1,16 +1,9 @@
 -- Reproduces the parts of a hosted Supabase database that exist BEFORE our migrations run:
--- the API roles, the auth schema owner, extensions, Supabase's default privileges, and
--- the storage schema. Used only by the local test stack (never deployed).
+-- the auth schema, extensions, Supabase's default privileges and the storage schema. Runs
+-- once per database, after bootstrap-roles.sql has created the cluster-wide roles. Used
+-- only by the local test stack and the migration test (never deployed).
 
--- API roles (same names and attributes as Supabase).
-create role anon nologin noinherit;
-create role authenticated nologin noinherit;
-create role service_role nologin noinherit bypassrls;
-create role authenticator login noinherit password 'authenticator-local';
-grant anon, authenticated, service_role to authenticator;
-
--- Supabase Auth (GoTrue) connects as this role and owns the auth schema.
-create role supabase_auth_admin login superuser password 'auth-admin-local';
+-- Supabase Auth (GoTrue) owns the auth schema (roles: bootstrap-roles.sql).
 create schema auth authorization supabase_auth_admin;
 grant usage on schema auth to anon, authenticated, service_role;
 

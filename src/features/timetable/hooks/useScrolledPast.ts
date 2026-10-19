@@ -8,6 +8,7 @@ export function useScrolledPast(ref: RefObject<HTMLElement | null>, offset = 120
     const el = ref.current;
     if (!el) return undefined;
     let frame = 0;
+    // Re-evaluates at most once per animation frame while scrolling.
     const update = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => setPast(el.scrollTop > offset));

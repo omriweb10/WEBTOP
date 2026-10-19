@@ -21,6 +21,7 @@ export function mixHex(color: string, base: string, ratio: number): string {
   const a = parseHex(color);
   const b = parseHex(base);
   if (!a || !b) return base;
+  // Linear interpolation of one channel.
   const mix = (from: number, to: number) => from + (to - from) * ratio;
   return toHex([mix(b[0], a[0]), mix(b[1], a[1]), mix(b[2], a[2])]);
 }

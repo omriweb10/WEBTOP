@@ -95,6 +95,7 @@ export function registerServiceWorker(): void {
       watchInstalling(registration.installing);
       registration.addEventListener('updatefound', () => watchInstalling(registration.installing));
 
+      // Looks for a new sw.js; failures (offline) are ignored and retried on the next trigger.
       const check = () => void registration.update().catch(() => undefined);
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') check();

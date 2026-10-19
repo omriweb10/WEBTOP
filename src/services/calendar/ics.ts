@@ -46,12 +46,14 @@ export function foldIcsLine(line: string): string {
 
 /** Formats a Date as a floating local "YYYYMMDDTHHMMSS" value. */
 function formatLocalDateTime(date: Date): string {
+  // Two-digit zero padding for date/time fields.
   const p = (n: number) => String(n).padStart(2, '0');
   return `${date.getFullYear()}${p(date.getMonth() + 1)}${p(date.getDate())}T${p(date.getHours())}${p(date.getMinutes())}00`;
 }
 
 /** Formats a Date as an all-day "YYYYMMDD" value. */
 function formatLocalDate(date: Date): string {
+  // Two-digit zero padding for date/time fields.
   const p = (n: number) => String(n).padStart(2, '0');
   return `${date.getFullYear()}${p(date.getMonth() + 1)}${p(date.getDate())}`;
 }

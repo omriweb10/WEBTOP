@@ -60,6 +60,7 @@ async function render(html, width, height, file) {
   await page.screenshot({ path: file, clip: { x: 0, y: 0, width, height }, omitBackground: false });
 }
 
+/** Wraps an icon SVG in a page of exactly its size. */
 const iconPage = (svg, size) => `<html><body style="margin:0;background:#12161c;width:${size}px;height:${size}px">${svg}</body></html>`;
 await render(iconPage(iconSvg({ size: 192 }), 192), 192, 192, path.join(OUT_ICONS, 'icon-192.png'));
 await render(iconPage(iconSvg({ size: 512 }), 512), 512, 512, path.join(OUT_ICONS, 'icon-512.png'));

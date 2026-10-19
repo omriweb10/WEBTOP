@@ -39,12 +39,14 @@ export function useSwipeNavigation(targetRef: RefObject<HTMLElement | null>, opt
       el.style.transform = px ? `translateX(${px}px)` : '';
     };
 
+    // Starts tracking a primary pointer (finger, pen or left mouse button).
     const onDown = (event: PointerEvent) => {
       if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0)) return;
       start = { x: event.clientX, y: event.clientY, t: event.timeStamp, id: event.pointerId };
       axis = null;
     };
 
+    // Classifies the gesture; vertical drags are released to native scrolling.
     const onMove = (event: PointerEvent) => {
       if (!start || event.pointerId !== start.id) return;
       const dx = event.clientX - start.x;
@@ -58,6 +60,7 @@ export function useSwipeNavigation(targetRef: RefObject<HTMLElement | null>, opt
       if (axis === 'horizontal') setOffset(dx * 0.3, false);
     };
 
+    // Ends the gesture: resets feedback and fires a swipe if it travelled far or fast enough.
     const finish = (event: PointerEvent, cancelled: boolean) => {
       if (!start || event.pointerId !== start.id) return;
       const dx = event.clientX - start.x;
@@ -72,6 +75,7 @@ export function useSwipeNavigation(targetRef: RefObject<HTMLElement | null>, opt
       else onSwipeRight();
     };
 
+    // pointercancel means the browser took over (e.g. started scrolling): never navigate then.
     const onUp = (event: PointerEvent) => finish(event, false);
     const onCancel = (event: PointerEvent) => finish(event, true);
 

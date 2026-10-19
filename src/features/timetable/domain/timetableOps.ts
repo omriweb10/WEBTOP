@@ -15,6 +15,7 @@ export type ConflictMode = 'replace' | 'swap';
 
 /** Builds a timetable where every period of every day is empty. */
 export function createEmptyTimetable(periods: readonly Period[]): Timetable {
+  // A fresh all-empty column per day (no shared arrays between days).
   const column = () => periods.map(() => null);
   return {
     periods: periods.map((p) => ({ ...p })),

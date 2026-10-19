@@ -74,6 +74,7 @@ export function loadValue<T>(store: KeyValueStore, spec: PersistedValueSpec<T>):
   const raw = store.get(spec.key);
   if (raw === null) return { value: spec.defaults(), status: 'missing' };
 
+  // Quarantines the raw value and falls back to defaults, recording why.
   const fail = (problem: string): LoadResult<T> => ({
     value: spec.defaults(),
     status: 'corrupt',

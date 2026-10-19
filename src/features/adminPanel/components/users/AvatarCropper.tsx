@@ -116,8 +116,8 @@ export function AvatarCropper({ image, busy, onSave, onCancel }: AvatarCropperPr
           <figcaption>מרובעת</figcaption>
         </figure>
         <figure className={styles.preview}>
-          <CropView image={image} crop={crop} frame={FRAME} size={36} round />
-          <figcaption>בכותרת</figcaption>
+          <CropView image={image} crop={crop} frame={FRAME} size={40} round />
+          <figcaption>בתפריט</figcaption>
         </figure>
       </div>
     </Modal>

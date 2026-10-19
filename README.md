@@ -52,7 +52,7 @@ It runs in one of two modes, chosen at build time:
     and delete students (display name, class, optional school and description).
   - **Profile pictures**: JPG/PNG/WebP upload, drag-to-position crop with zoom, round and square
     previews, exported as a 512×512 WebP (JPEG fallback) to a private Storage bucket; shown in
-    the student's app bar and menu.
+    the student's side menu and settings (the app bar keeps the original WEBTOP layout).
   - **Access codes**: strong generated codes or custom ones with strength warnings (weak codes
     need an explicit opt-in); shown **once**, stored only as an HMAC; replace or revoke; last
     use and current connection shown.

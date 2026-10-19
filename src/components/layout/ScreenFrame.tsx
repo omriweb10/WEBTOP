@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import { accountMode } from '../../config/backend';
-import { AccountHeaderButton } from '../../features/account/components/AccountHeaderButton';
 import { OfflineStrip } from '../../features/account/components/OfflineStrip';
 import { EditModeBar } from '../../features/admin/components/EditModeBar';
 import { useIsEditing } from '../../features/admin/editModeStore';
@@ -22,20 +21,7 @@ export function ScreenFrame({ title, actions, onTitleTap, children }: ScreenFram
   const editing = useIsEditing();
   return (
     <div className={styles.frame}>
-      <Header
-        title={title}
-        actions={
-          accountMode ? (
-            <>
-              {actions}
-              <AccountHeaderButton />
-            </>
-          ) : (
-            actions
-          )
-        }
-        onTitleTap={onTitleTap}
-      />
+      <Header title={title} actions={actions} onTitleTap={onTitleTap} />
       {accountMode && <OfflineStrip />}
       {editing && <EditModeBar />}
       <main className={styles.content}>{children}</main>

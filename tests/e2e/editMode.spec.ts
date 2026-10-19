@@ -26,7 +26,9 @@ test.describe('hidden local edit mode', () => {
     await expect(bar).toBeVisible();
     await expect(page.getByRole('dialog')).toHaveCount(0);
     await expect(page.getByRole('textbox')).toHaveCount(0);
-    await expect(bar).toContainText('במכשיר זה בלבד');
+    await expect(bar).toHaveText(/^מצב עריכה/);
+    await expect(bar).not.toContainText('במכשיר');
+    await expect(page.getByText('מצב עריכה הופעל')).toBeVisible();
     await expect(page.getByRole('button', { name: /עריכת שעה 1/ })).toBeVisible();
     await bar.getByRole('button', { name: 'יציאה' }).click();
     await expect(bar).toHaveCount(0);

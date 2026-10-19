@@ -35,11 +35,22 @@ export const presetsSlice: PersistedValueSpec<Preset[]> = {
   defaults: () => DEFAULT_PRESETS.map((p) => ({ ...p })),
 };
 
+/** The sidebar subtitle that version 1 shipped as its default. */
+export const LEGACY_DEFAULT_SUBTITLE = 'עותק אישי · לא רשמי';
+
 export const profileSlice: PersistedValueSpec<Profile> = {
   key: `${NAMESPACE}:profile`,
-  version: 1,
+  version: 2,
   schema: ProfileSchema,
   defaults: () => ({ ...DEFAULT_PROFILE }),
+  migrations: {
+    // v1 → v2: an untouched old default subtitle becomes the new default; text the user
+    // wrote is kept as it is.
+    1: (data) =>
+      typeof data === 'object' && data !== null && (data as { subtitle?: unknown }).subtitle === LEGACY_DEFAULT_SUBTITLE
+        ? { ...data, subtitle: DEFAULT_PROFILE.subtitle }
+        : data,
+  },
 };
 
 export const noticesSlice: PersistedValueSpec<Notice[]> = {

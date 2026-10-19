@@ -1,3 +1,4 @@
+import { APP_NAME } from '../../../config/branding';
 import { useProfileStore, useTimetableStore } from '../../../store/dataStores';
 import { DAYS } from '../domain/days';
 import { formatPeriodLabel } from '../domain/periods';
@@ -44,7 +45,7 @@ export function PrintableWeek() {
           ))}
         </tbody>
       </table>
-      <p className={styles.footer}>עותק אישי לא רשמי — אינו קשור ל‑WEBTOP או לבית הספר.</p>
+      <p className={styles.footer}>{APP_NAME} · עותק אישי</p>
     </div>
   );
 }

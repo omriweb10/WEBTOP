@@ -49,6 +49,10 @@ It runs in one of two modes, chosen at build time:
   lesson cards with the same subject edge colours); System follows the device and changes live.
   The choice is remembered on the device and applied before the first paint, so the app never
   flashes the wrong theme.
+- **A clean interface**: the sidebar and login show the app's own name (מערכת שעות), never the
+  WEBTOP brand, and carry no disclaimer banners. What the app is — an independent personal
+  timetable, not the official WEBTOP, with no sync to it — together with how sign-in and data
+  storage work, is explained once, in **Settings → אודות**.
 
 ### Account mode (Supabase)
 
@@ -78,7 +82,8 @@ It runs in one of two modes, chosen at build time:
     template's library subjects into each student's own list (reusing earlier copies).
   - **Per-student timetable** editor (with that student's own subjects only), plus notices
     and events/exams for everyone or for one student.
-- **Students**: a single access-code field (with a warning never to type a WEBTOP password).
+- **Students**: a single access-code field for the code an admin issued (Settings → אודות states
+  that it is never a WEBTOP or school password).
   The server allows **one live session per code**: a second device is refused, never the
   first. Sessions persist indefinitely with rotating refresh tokens; nothing expires on
   inactivity. The 7-tap edit mode lets a signed-in student arrange **their own** timetable from
@@ -282,6 +287,13 @@ Design rules followed:
   launches, so after switching theme inside a running app the band under the status bar stays
   navy (legible white status text) until the next launch.
 - The manifest colours and launch images stay dark: they are fixed at install time.
+- The app frame is pinned to the viewport box (`position: fixed; inset: 0` in
+  `src/app/App.module.css`) instead of being sized with `100vh`/`100dvh`. In a Home Screen app
+  with the translucent status bar, WebKit resolves those units to the screen height minus the
+  status bar, which left an empty dark band (status bar + home indicator high) under the
+  timetable. The viewport box always matches the real web view, so both themes share one
+  layout; the safe-area bands come from `env(safe-area-inset-*)`. `tests/e2e/layout.spec.ts`
+  checks the frame, the insets and the last timetable row in both themes.
 
 ### Backup file format
 

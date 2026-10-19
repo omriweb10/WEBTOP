@@ -6,8 +6,8 @@ import { Icon } from '../../../components/ui/Icon';
 import styles from './PlaceholderScreen.module.css';
 
 /**
- * Clearly-labelled local placeholder for menu entries that exist in the official system
- * but have no local equivalent here. No data is fetched and nothing is simulated.
+ * Clearly-labelled placeholder for menu entries the app does not offer (yet). No data is
+ * fetched and nothing is simulated.
  */
 export function PlaceholderScreen({ id }: { id: PlaceholderId }) {
   const title = PLACEHOLDER_TITLES[id];
@@ -17,12 +17,9 @@ export function PlaceholderScreen({ id }: { id: PlaceholderId }) {
         <section className={styles.card} aria-labelledby="placeholder-title">
           <Icon name="info" size={36} className={styles.icon} />
           <h2 id="placeholder-title" className={styles.heading}>
-            מסך מקום־שמור (Placeholder)
+            המסך הזה עדיין לא זמין
           </h2>
-          <p className={styles.text}>
-            „{title}” קיים רק במערכת הרשמית. בגרסה המקומית והלא־רשמית הזו אין למסך הזה תוכן, ואין חיבור לשרתים של WEBTOP או
-            של בית הספר.
-          </p>
+          <p className={styles.text}>אין כרגע תוכן ב„{title}”.</p>
           <Button variant="primary" icon="tableChart" onClick={() => navigate({ name: 'schedule', tab: 'timetable' })}>
             למערכת השעות
           </Button>

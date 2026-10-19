@@ -16,7 +16,7 @@ export function TimetableHeaderActions() {
   /** Flips the alert preference and explains what it does. */
   const toggleAlerts = () => {
     updateSettings((settings) => ({ ...settings, changeAlerts: !settings.changeAlerts }));
-    toast(alertsOn ? 'התראות שינויים כובו' : 'התראות שינויים הופעלו: שינויי מערכת מקומיים עם תאריך יוצגו מעל המערכת');
+    toast(alertsOn ? 'התראות שינויים כובו' : 'התראות שינויים הופעלו: שינויים עם תאריך יוצגו מעל המערכת');
   };
 
   return (

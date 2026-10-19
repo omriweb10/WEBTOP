@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { APP_NAME } from '../../config/branding';
 import { useAccountStore } from '../../features/account/accountStore';
 import type { Profile } from '../../schemas/content';
 import { localStore } from '../../services/storage/appStorage';
@@ -18,7 +19,7 @@ function previousLaunchLabel(): string | null {
   return `${formatDmy(date)} (${time})`;
 }
 
-/** Drawer header: unofficial brand line, profile picture, display name and previous launch time. */
+/** Drawer header: the app's name, profile picture, display name and previous launch time. */
 export function SidebarHeader({ profile }: { profile: Profile }) {
   const [lastLaunch] = useState(previousLaunchLabel);
   const avatarUrl = useAccountStore((state) => state.avatarUrl);
@@ -32,8 +33,7 @@ export function SidebarHeader({ profile }: { profile: Profile }) {
       </svg>
       <div className={styles.brand}>
         <Icon name="school" size={22} />
-        <span className={styles.brandName}>WEBTOP</span>
-        <span className={styles.unofficial}>לא רשמי</span>
+        <span className={styles.brandName}>{APP_NAME}</span>
       </div>
       <div className={styles.identity}>
         <Avatar name={name} src={avatarUrl} size={40} />

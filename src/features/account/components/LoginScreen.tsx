@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Button } from '../../../components/ui/Button';
 import { Icon } from '../../../components/ui/Icon';
+import { APP_NAME } from '../../../config/branding';
 import { useAccountStore } from '../accountStore';
 import { loginFailureMessage, signOutMessage } from '../domain/loginMessages';
 import styles from './LoginScreen.module.css';
@@ -9,7 +10,8 @@ const CODE_INPUT_ID = 'access-code';
 
 /**
  * The only way in for students: one field for the personal access code an administrator
- * issued. It is not a WEBTOP password and the screen says so plainly.
+ * issued. What the app is, and that the code is never a school password, is explained in
+ * Settings → About.
  */
 export function LoginScreen() {
   const login = useAccountStore((state) => state.actions?.login);
@@ -34,8 +36,7 @@ export function LoginScreen() {
       <form className={styles.card} onSubmit={(event) => void submit(event)} noValidate aria-labelledby="login-title">
         <div className={styles.brand}>
           <Icon name="school" size={26} />
-          <span className={styles.brandName}>WEBTOP</span>
-          <span className={styles.unofficial}>לא רשמי</span>
+          <span className={styles.brandName}>{APP_NAME}</span>
         </div>
         <h1 id="login-title" className={styles.title}>
           כניסה עם קוד אישי
@@ -67,7 +68,7 @@ export function LoginScreen() {
           enterKeyHint="go"
           placeholder="XXXX-XXXX-XXXX"
           aria-invalid={error ? true : undefined}
-          aria-describedby={error ? 'login-error' : 'login-warning'}
+          aria-describedby={error ? 'login-error' : undefined}
           disabled={busy}
         />
         {error && (
@@ -80,16 +81,6 @@ export function LoginScreen() {
           {busy ? 'מתחבר…' : 'כניסה'}
         </Button>
 
-        <p id="login-warning" className={styles.warning}>
-          <Icon name="lock" size={18} />
-          <span>
-            <strong>לעולם אל תזינו כאן סיסמה של WEBTOP</strong> או של כל מערכת בית־ספרית אחרת. האפליקציה אינה קשורה ל‑WEBTOP
-            ומשתמשת רק בקוד שהונפק בה.
-          </span>
-        </p>
-        <p className={styles.footnote}>
-          החיבור נשמר במכשיר הזה עד שתתנתקו. כל קוד יכול להיות מחובר במכשיר אחד בלבד בכל רגע.
-        </p>
       </form>
     </div>
   );

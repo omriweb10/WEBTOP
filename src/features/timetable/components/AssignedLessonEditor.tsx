@@ -63,11 +63,7 @@ export function AssignedLessonEditor({ slot, onClose }: AssignedLessonEditorProp
       }
     >
       <h3 className={styles.heading}>בחירת מקצוע</h3>
-      {choices.length === 0 ? (
-        <p className={styles.note}>עדיין לא הוקצו לך מקצועות. אפשר לסמן שעה ריקה, או לבקש מהמנהל להקצות מקצועות.</p>
-      ) : (
-        <p className={styles.note}>המקצועות, המורים, החדרים והצבעים מוגדרים על ידי מנהל האפליקציה.</p>
-      )}
+      {choices.length === 0 && <p className={styles.note}>עדיין לא הוקצו לך מקצועות. אפשר לסמן שעה ריקה.</p>}
       <PresetPicker
         presets={choices}
         selected={preset ? preset.id : EMPTY_PRESET}

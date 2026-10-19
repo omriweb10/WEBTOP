@@ -99,13 +99,35 @@ test.describe('timetable view', () => {
 
     await page.getByRole('button', { name: 'פתיחת תפריט' }).click();
     await menu.getByRole('button', { name: 'ספר טלפונים' }).click();
-    await expect(page.getByText('מסך מקום־שמור (Placeholder)')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'המסך הזה עדיין לא זמין' })).toBeVisible();
+    await expect(page.getByText(/WEBTOP|רשמי/)).toHaveCount(0);
   });
 
-  test('About screen states the project is unofficial', async ({ page }) => {
+  test('Settings → About explains the app is independent and does not sync with WEBTOP', async ({ page }) => {
     await openApp(page, '#/settings');
-    await expect(page.getByText('פרויקט אישי לא רשמי.')).toBeVisible();
-    await expect(page.getByText(/אינה קשורה ל‑WEBTOP/)).toBeVisible();
+    const about = page.getByRole('region', { name: 'אודות' });
+    await expect(about).toContainText('מערכת שעות היא אפליקציה אישית ועצמאית');
+    await expect(about).toContainText('זו אינה האפליקציה הרשמית של WEBTOP');
+    await expect(about).toContainText('אינם מסתנכרנים עם מערכת WEBTOP הרשמית');
+    await expect(about).toContainText('נשמרים רק במכשיר הזה');
+    // The persistent-storage controls moved into About with the storage explanation.
+    await expect(page.getByRole('region', { name: 'שמירת נתונים' })).toHaveCount(0);
+  });
+
+  test('regular screens carry no disclaimers; the brand is the app’s own name', async ({ page }) => {
+    const disclaimer = /לא רשמי|לא־רשמי|אינה קשורה|אינו קשור|מסתנכרנ|במכשיר (?:הזה|זה) בלבד|מקום־שמור/;
+    await openApp(page);
+    await expect(page.locator('body')).not.toContainText(disclaimer);
+    await page.getByRole('button', { name: 'פתיחת תפריט' }).click();
+    const menu = page.getByRole('dialog', { name: 'תפריט ראשי' });
+    await expect(menu).toContainText('מערכת שעות');
+    await expect(menu).not.toContainText(disclaimer);
+    await expect(menu).not.toContainText('WEBTOP');
+    await page.keyboard.press('Escape');
+    for (const hash of ['#/schedule/changes', '#/schedule/events', '#/home']) {
+      await page.goto(hash);
+      await expect(page.locator('body')).not.toContainText(disclaimer);
+    }
   });
 
   test('no simulated iOS status bar or recording indicator is rendered', async ({ page }) => {

@@ -30,16 +30,6 @@
 .brandName {
   font-size: var(--font-size-lg);
   font-weight: 800;
-  letter-spacing: 0.06em;
-}
-
-.unofficial {
-  padding: 1px 6px;
-  border: 1px solid var(--color-chip-outline);
-  border-radius: 6px;
-  font-size: var(--font-size-xs);
-  font-weight: 600;
-  color: var(--color-text-secondary);
 }
 
 .title {
@@ -120,29 +110,3 @@
   font-size: var(--font-size-lg);
 }
 
-.warning {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  margin: 18px 0 0;
-  padding: 12px;
-  border: 1px solid var(--color-edit-border-soft);
-  border-radius: 12px;
-  background: var(--color-warning-tint);
-  color: var(--color-warning-text);
-  font-size: var(--font-size-sm);
-  line-height: 1.55;
-}
-
-.warning svg {
-  flex: none;
-  margin-top: 1px;
-}
-
-.footnote {
-  margin: 14px 0 0;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  line-height: 1.5;
-  text-align: center;
-}

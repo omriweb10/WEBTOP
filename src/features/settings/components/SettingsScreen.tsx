@@ -9,10 +9,10 @@ import { toast } from '../../../store/uiStore';
 import { AccountSection } from '../../account/components/AccountSection';
 import { useEditModeStore } from '../../admin/editModeStore';
 import { ThemeSelector } from '../../../theme/components/ThemeSelector';
-import { StorageNotice } from './StorageNotice';
+import { AboutSection } from './AboutSection';
 import styles from './SettingsScreen.module.css';
 
-/** About / settings: unofficial-project disclaimer, version & offline status, storage notes. */
+/** Settings and About: account, appearance, what the app is, version & offline status, edit mode. */
 export function SettingsScreen() {
   const editing = useEditModeStore((state) => state.unlocked);
   const lock = useEditModeStore((state) => state.lock);
@@ -42,27 +42,7 @@ export function SettingsScreen() {
             <ThemeSelector />
           </div>
         </SectionCard>
-        <SectionCard id="about" title="אודות">
-          <div className={styles.body}>
-            <p className={styles.disclaimer}>
-              <strong>פרויקט אישי לא רשמי.</strong> האפליקציה בהשראת ממשק WEBTOP אך אינה קשורה ל‑WEBTOP, ליצרנית שלה, למשרד
-              החינוך או לבית ספר כלשהו, ואינה מייצגת אותם.
-            </p>
-            {accountMode ? (
-              <ul className={styles.facts}>
-                <li>הכניסה היא בקוד גישה אישי שמנפיק מנהל האפליקציה — לא בסיסמה של WEBTOP, ואין שימוש בשרתים של WEBTOP.</li>
-                <li>מערכת השעות, ההודעות והאירועים נשמרים בשרת של האפליקציה (Supabase) ומוצגים רק לך.</li>
-                <li>זו אפליקציית רשת (PWA) שמותקנת דרך „הוספה למסך הבית” — לא אפליקציה חתומה מה‑App Store.</li>
-              </ul>
-            ) : (
-              <ul className={styles.facts}>
-                <li>אין התחברות, אין איסוף סיסמאות ואין שימוש בשרתים או בממשקים של WEBTOP.</li>
-                <li>כל הנתונים (מערכת, הודעות, אירועים) מוזנים ונשמרים מקומית במכשיר בלבד.</li>
-                <li>זו אפליקציית רשת (PWA) שמותקנת דרך „הוספה למסך הבית” — לא אפליקציה חתומה מה‑App Store.</li>
-              </ul>
-            )}
-          </div>
-        </SectionCard>
+        <AboutSection />
 
         <SectionCard id="version" title="גרסה ועבודה ללא רשת">
           <div className={styles.body}>
@@ -82,16 +62,8 @@ export function SettingsScreen() {
           </div>
         </SectionCard>
 
-        {!accountMode && (
-          <SectionCard id="storage" title="שמירת נתונים">
-            <div className={styles.body}>
-              <StorageNotice />
-            </div>
-          </SectionCard>
-        )}
-
         {editing && (
-          <SectionCard id="edit" title={accountMode ? 'עריכת המערכת שלי' : 'מצב עריכה מקומי'}>
+          <SectionCard id="edit" title={accountMode ? 'עריכת המערכת שלי' : 'מצב עריכה'}>
             <div className={styles.body}>
               <div className={styles.row}>
                 {!accountMode && (

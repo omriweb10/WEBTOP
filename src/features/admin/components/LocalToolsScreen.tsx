@@ -10,12 +10,9 @@ import styles from './LocalToolsScreen.module.css';
 /** Local edit-mode tools (local mode only): profile, subject presets, backup/import and resets. */
 export function LocalToolsScreen() {
   return (
-    <ScreenFrame title="כלי עריכה מקומיים">
+    <ScreenFrame title="כלי עריכה">
       <div className={styles.scroll}>
-        <p className={styles.intro}>
-          כל השינויים כאן חלים על העותק האישי שלך במכשיר הזה בלבד. אין חיבור ל‑WEBTOP ואין שליחת נתונים לשום שרת. לעריכת שיעור
-          — יש להקיש עליו במסך מערכת השעות.
-        </p>
+        <p className={styles.intro}>לעריכת שיעור — הקישו עליו במסך מערכת השעות.</p>
         <SectionCard id="admin-profile" title="פרטי תצוגה">
           <div className={styles.sectionBody}>
             <ProfileForm />

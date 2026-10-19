@@ -1,5 +1,4 @@
 import { useCallback, useRef } from 'react';
-import { accountMode } from '../../../config/backend';
 import { toast } from '../../../store/uiStore';
 import { EMPTY_TAP_SEQUENCE, registerTap, type TapSequence } from '../domain/tapUnlock';
 import { currentEditModeBlocker } from '../editCapabilities';
@@ -28,11 +27,6 @@ export function useSevenTapUnlock(): () => void {
       return;
     }
     state.enable();
-    toast(
-      accountMode
-        ? 'מצב עריכה הופעל. אפשר לשבץ רק מקצועות שהמנהל הקצה לך; השינויים נשמרים בחשבון.'
-        : 'מצב עריכה מקומי הופעל. השינויים נשמרים רק במכשיר הזה.',
-      { tone: 'success', duration: 4500 },
-    );
+    toast('מצב עריכה הופעל', { tone: 'success' });
   }, []);
 }

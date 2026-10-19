@@ -14,6 +14,36 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="מערכת שעות" />
 
+    <!-- Theme boot: applies the saved theme before the first paint so launch never flashes the
+         wrong colours (mirrors src/theme/themeConfig.ts; kept in sync by tests/unit/theme.test.ts). -->
+    <script>
+      (function () {
+        var chrome = {
+          dark: { themeColor: '#12161c', colorScheme: 'dark', statusBarStyle: 'black-translucent' },
+          light: { themeColor: '#f6f6f6', colorScheme: 'light', statusBarStyle: 'default' }
+        };
+        var preference = 'dark';
+        try {
+          var stored = JSON.parse(localStorage.getItem('webtop-pwa:theme') || 'null');
+          if (stored && (stored.data === 'light' || stored.data === 'dark' || stored.data === 'system')) preference = stored.data;
+        } catch (error) {
+          /* storage unavailable: keep the default */
+        }
+        var theme = preference;
+        if (preference === 'system') {
+          theme = window.matchMedia && !window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark';
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+        var setMeta = function (name, value) {
+          var meta = document.querySelector('meta[name="' + name + '"]');
+          if (meta) meta.setAttribute('content', value);
+        };
+        setMeta('theme-color', chrome[theme].themeColor);
+        setMeta('color-scheme', chrome[theme].colorScheme);
+        setMeta('apple-mobile-web-app-status-bar-style', chrome[theme].statusBarStyle);
+      })();
+    </script>
+
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
@@ -35,11 +65,15 @@
 
     <title>מערכת שעות · בהשראת WEBTOP (לא רשמי)</title>
     <style>
-      /* Paint the dark background before CSS loads, so launch never flashes white. */
+      /* Paint the theme's background before CSS loads, so launch never flashes. */
       html,
       body {
         background: #12161c;
         margin: 0;
+      }
+      html[data-theme='light'],
+      html[data-theme='light'] body {
+        background: #f6f6f6;
       }
     </style>
   </head>

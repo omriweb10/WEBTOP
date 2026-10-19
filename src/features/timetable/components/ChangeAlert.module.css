@@ -5,9 +5,9 @@
   width: calc(100% - 2 * var(--page-gutter));
   margin: 10px var(--page-gutter);
   padding: 10px 12px;
-  border: 1px solid rgb(130 177 242 / 0.4);
+  border: 1px solid var(--color-alert-border);
   border-radius: 10px;
-  background: #18263b;
+  background: var(--color-alert-bg);
   color: var(--color-text);
   text-align: start;
 }

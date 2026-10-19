@@ -60,13 +60,14 @@ only. Sizes were calibrated by matching rendered text widths to measured widths 
 
 ## Colours
 
-Surfaces and text colours were sampled with 3×3/median pixel sampling (see `src/styles/tokens.css`).
+Surfaces and text colours were sampled with 3×3/median pixel sampling (see
+`src/styles/themes/dark.css`; the light theme is described at the end of this section).
 
 Subject accents follow the project brief and were cross-checked against the card edges in the
 recording. The sampled values differ only by H.264 chroma error. Card backgrounds in the
 recording equal the accent mixed into `#191e29` at about **16 %**: every subject measured
-15–17 %. The app computes that mix itself (`CARD_TINT_RATIO`) instead of storing a second
-colour per subject.
+15–17 %. The app computes that mix itself (`src/theme/lessonCardColors.ts`) instead of storing a
+second colour per subject.
 
 | Subject (preset) | Accent |
 |---|---|
@@ -81,6 +82,27 @@ colour per subject.
 | Chemistry | `#92be43` |
 | Robotics / Biotechnology / Biology | `#259e3b` |
 | Traffic education (חינוך תעבורתי) | `#e50066` (observed: same accent as sign language) |
+
+### Light theme (from the original WEBTOP light screenshot)
+
+Sampled from an iPhone screenshot (402×874 pt at 2.29 px/pt). Geometry is identical to the dark
+theme (55 pt app bar, 48 pt tabs, 64 pt display panel, 8 pt gap, 58 pt day bar, 16 pt gutters,
+92 pt period column, 4 pt card padding and accent edge); only colours change, plus the display
+panel's rounded lower corners and soft shadow.
+
+| Element | Light value |
+|---|---|
+| App bar | `#1d3e61`, white title and icons |
+| Tabs | white, `#1d1d1d` labels; active tab and underline `#1d3e61`; `#e2e5eb` divider |
+| Display panel | white, `#e1e1e1` underline, 8 pt lower radius, soft shadow; `#efefef` gap below |
+| Day selector | white, `#1d1d1d` letters; selected `#25a89d` circle with white letter |
+| Table | header `#eff3f6`, grid `#e6e8ee`, white cells, bold `#1b1b1b` period labels |
+| Lesson cards | accent edge unchanged; background = accent mixed into white at **20 %** |
+| Bands | `#f6f6f6` home-indicator band |
+
+The 20 % rule reproduces the sampled cards within 1–3 RGB units (mathematics `#cfeafe`,
+education `#fff2cc`, Hebrew `#ffddcd`, chemistry `#e8f2da`) and stays within 8 units of the
+brief's initial table for the subjects the screenshot does not show.
 
 ## Interactions (observed → implemented)
 

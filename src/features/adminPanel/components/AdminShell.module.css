@@ -17,19 +17,21 @@
   gap: 10px;
   min-height: var(--appbar-height);
   padding: 0 8px 0 16px;
-  background: linear-gradient(90deg, #13283d, #14263c);
-  border-bottom: 1px solid #1f3550;
+  background: linear-gradient(90deg, var(--color-admin-bar-start), var(--color-admin-bar-end));
+  /* Pressed icon buttons on the navy bar use a light overlay in every theme. */
+  --icon-pressed: rgb(255 255 255 / 0.1);
+  border-bottom: 1px solid var(--color-admin-bar-border);
 }
 
 .logo {
-  color: #7fd1c7;
+  color: var(--color-admin-brand-on-bar);
 }
 
 .brand {
   flex: 1;
   font-size: var(--font-size-lg);
   font-weight: 800;
-  color: var(--color-text-strong);
+  color: var(--color-on-appbar);
 }
 
 .email {
@@ -38,7 +40,14 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
+  color: var(--color-on-appbar-muted);
+}
+
+/* Phones: the theme selector takes the e-mail's place in the bar. */
+@media (max-width: 560px) {
+  .email {
+    display: none;
+  }
 }
 
 .main {
@@ -51,8 +60,8 @@
   grid-area: nav;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  border-top: 1px solid #222a38;
-  background: #151a24;
+  border-top: 1px solid var(--color-nav-border);
+  background: var(--color-nav-bg);
 }
 
 .navItem {
@@ -93,7 +102,7 @@
     gap: 4px;
     padding: 12px 10px;
     border-top: 0;
-    border-inline-end: 1px solid #222a38;
+    border-inline-end: 1px solid var(--color-nav-border);
   }
 
   .navItem {
@@ -107,6 +116,6 @@
   }
 
   .navActive {
-    background: rgb(130 177 242 / 0.12);
+    background: var(--color-accent-soft);
   }
 }

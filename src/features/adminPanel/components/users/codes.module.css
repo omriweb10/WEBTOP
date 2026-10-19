@@ -2,8 +2,8 @@
   margin: 0 0 12px;
   padding: 10px 12px;
   border-radius: 10px;
-  background: rgb(242 184 75 / 0.1);
-  color: #f6cf86;
+  background: var(--color-edit-soft);
+  color: var(--color-warning-text);
   font-size: var(--font-size-md);
   line-height: 1.5;
 }
@@ -11,9 +11,9 @@
 .code {
   display: block;
   padding: 18px 12px;
-  border: 1px dashed #3d4a63;
+  border: 1px dashed var(--color-code-box-border);
   border-radius: 14px;
-  background: #10151e;
+  background: var(--color-code-input-bg);
   color: var(--color-text-strong);
   font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   font-size: clamp(20px, 7vw, 30px);
@@ -54,9 +54,9 @@
   width: 100%;
   min-height: 50px;
   padding: 10px 12px;
-  border: 1px solid #343c4d;
+  border: 1px solid var(--color-control-border);
   border-radius: 12px;
-  background: #121722;
+  background: var(--color-input-deep);
   color: var(--color-text-strong);
   font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
   font-size: 18px;
@@ -74,7 +74,7 @@
   margin-top: 10px;
   overflow: hidden;
   border-radius: 999px;
-  background: #222937;
+  background: var(--color-chip-muted);
 }
 
 .meterFill {
@@ -106,7 +106,7 @@
 .warnings {
   margin: 8px 0 0;
   padding-inline-start: 18px;
-  color: #ffb4b4;
+  color: var(--color-danger-text-soft);
   font-size: var(--font-size-md);
   line-height: 1.5;
 }

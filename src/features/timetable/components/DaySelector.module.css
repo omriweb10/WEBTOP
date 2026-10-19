@@ -26,7 +26,7 @@
   width: var(--day-circle);
   height: var(--day-circle);
   border-radius: 50%;
-  color: #dce0e8;
+  color: var(--color-day-text);
   font-size: 15px;
   font-weight: 700;
   line-height: 1;
@@ -41,5 +41,5 @@
 }
 
 .day:active .circle {
-  background: rgb(69 171 160 / 0.35);
+  background: var(--color-day-pressed);
 }

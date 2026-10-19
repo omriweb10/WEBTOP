@@ -14,7 +14,7 @@
 }
 
 .button:active {
-  background: rgb(255 255 255 / 0.1);
+  background: var(--icon-pressed, var(--color-icon-pressed));
 }
 
 .button:disabled {
@@ -31,7 +31,7 @@
   padding: 0 5px;
   border-radius: 8px;
   background: var(--color-badge);
-  color: #fff;
+  color: var(--color-on-badge);
   font-size: 10px;
   font-weight: 700;
   line-height: 16px;

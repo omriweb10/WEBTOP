@@ -10,9 +10,9 @@
   gap: 6px;
   min-height: 36px;
   padding: 0 12px;
-  border: 1px solid #343c4d;
+  border: 1px solid var(--color-control-border);
   border-radius: 18px;
-  background: #1a202b;
+  background: var(--color-chip-bg);
   color: var(--color-text);
   font-size: var(--font-size-md);
   touch-action: manipulation;
@@ -32,7 +32,7 @@
 
 .selected {
   border-color: var(--color-accent);
-  background: #1d2e47;
+  background: var(--color-selected-bg);
   color: var(--color-text-strong);
   font-weight: 700;
 }

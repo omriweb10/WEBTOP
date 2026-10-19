@@ -1,7 +1,7 @@
 .gridScroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  border: 1px solid #252d3c;
+  border: 1px solid var(--color-panel-border);
   border-radius: 12px;
 }
 
@@ -16,8 +16,8 @@
 
 .grid th,
 .grid td {
-  border-bottom: 1px solid #222937;
-  border-inline-start: 1px solid #222937;
+  border-bottom: 1px solid var(--color-row-divider);
+  border-inline-start: 1px solid var(--color-row-divider);
   vertical-align: top;
 }
 
@@ -37,7 +37,7 @@
   inset-inline-start: 0;
   z-index: 2;
   width: 76px;
-  background: #1a202b;
+  background: var(--color-grid-sticky);
 }
 
 .periodCell {
@@ -63,7 +63,7 @@
 }
 
 .dropping {
-  background: rgb(130 177 242 / 0.14);
+  background: var(--color-accent-soft-strong);
   outline: 2px dashed var(--color-accent);
   outline-offset: -3px;
 }
@@ -84,7 +84,7 @@
 .chip {
   border: 0;
   border-inline-start: 4px solid var(--color-accent);
-  background: #222a38;
+  background: var(--color-lesson-chip);
   color: var(--color-text);
   cursor: grab;
 }
@@ -108,9 +108,9 @@
 
 .empty {
   align-items: center;
-  border: 1px dashed #2c3445;
+  border: 1px dashed var(--color-empty-border-soft);
   background: transparent;
-  color: #4f5a70;
+  color: var(--color-empty-text);
   font-size: 20px;
 }
 
@@ -177,7 +177,7 @@
   align-items: center;
   gap: 8px;
   padding: 6px 10px;
-  border: 1px solid #252d3c;
+  border: 1px solid var(--color-panel-border);
   border-radius: 10px;
 }
 
@@ -202,17 +202,16 @@
   min-width: 0;
   min-height: 38px;
   padding: 4px 6px;
-  border: 1px solid #343c4d;
+  border: 1px solid var(--color-control-border);
   border-radius: 8px;
-  background: #121722;
+  background: var(--color-input-deep);
   color: var(--color-text);
-  color-scheme: dark;
 }
 
 .errors {
   margin: 10px 0 0;
   padding-inline-start: 18px;
-  color: #ffb4b4;
+  color: var(--color-danger-text-soft);
   font-size: var(--font-size-md);
 }
 

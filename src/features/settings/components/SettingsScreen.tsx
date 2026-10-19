@@ -8,6 +8,7 @@ import { checkForUpdate, usePwaStore } from '../../../services/pwa/serviceWorker
 import { toast } from '../../../store/uiStore';
 import { AccountSection } from '../../account/components/AccountSection';
 import { useEditModeStore } from '../../admin/editModeStore';
+import { ThemeSelector } from '../../../theme/components/ThemeSelector';
 import { StorageNotice } from './StorageNotice';
 import styles from './SettingsScreen.module.css';
 
@@ -36,6 +37,11 @@ export function SettingsScreen() {
     <ScreenFrame title="הגדרות ואודות">
       <div className={styles.scroll}>
         {accountMode && <AccountSection />}
+        <SectionCard id="appearance" title="מראה">
+          <div className={styles.body}>
+            <ThemeSelector />
+          </div>
+        </SectionCard>
         <SectionCard id="about" title="אודות">
           <div className={styles.body}>
             <p className={styles.disclaimer}>

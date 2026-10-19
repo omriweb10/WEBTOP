@@ -17,20 +17,20 @@
   padding: 6px 6px 6px 14px;
   padding-inline-start: 14px;
   border-radius: 12px;
-  background: #2a3242;
-  border: 1px solid #3a4457;
-  box-shadow: 0 6px 24px rgb(0 0 0 / 0.4);
+  background: var(--color-toast-bg);
+  border: 1px solid var(--color-toast-border);
+  box-shadow: var(--shadow-toast);
   font-size: var(--font-size-base);
   pointer-events: auto;
   animation: fade-in var(--duration-fast) var(--ease-standard);
 }
 
 .success {
-  border-color: rgb(79 192 141 / 0.45);
+  border-color: var(--color-toast-success-border);
 }
 
 .error {
-  border-color: rgb(242 107 107 / 0.6);
+  border-color: var(--color-toast-error-border);
 }
 
 .message {

@@ -15,7 +15,7 @@
 }
 
 .drawer::backdrop {
-  background: rgb(8 11 16 / 0.35);
+  background: var(--color-sidebar-backdrop);
   animation: fade-in var(--duration-medium) var(--ease-standard);
 }
 
@@ -29,7 +29,7 @@
   padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
   background: var(--color-surface);
-  box-shadow: 0 0 24px rgb(0 0 0 / 0.5);
+  box-shadow: var(--shadow-sidebar);
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
@@ -71,7 +71,7 @@
 .brand {
   gap: 8px;
   height: 28px;
-  color: var(--color-text-strong);
+  color: var(--color-on-appbar);
 }
 
 .brandName {
@@ -82,11 +82,11 @@
 
 .unofficial {
   padding: 1px 6px;
-  border: 1px solid rgb(255 255 255 / 0.35);
+  border: 1px solid var(--color-on-appbar-outline);
   border-radius: 6px;
   font-size: var(--font-size-xs);
   font-weight: 600;
-  color: var(--color-text-secondary);
+  color: var(--color-on-appbar-subtle);
 }
 
 .identity {
@@ -103,7 +103,7 @@
 .name {
   font-size: var(--font-size-xl);
   font-weight: 700;
-  color: var(--color-text-strong);
+  color: var(--color-on-appbar);
   line-height: 1.25;
   white-space: nowrap;
   overflow: hidden;
@@ -113,7 +113,7 @@
 .lastLogin {
   font-size: var(--font-size-xs);
   font-weight: 700;
-  color: var(--color-text-strong);
+  color: var(--color-on-appbar);
 }
 
 .subtitle {
@@ -150,12 +150,12 @@
 }
 
 .item:active {
-  background: rgb(255 255 255 / 0.06);
+  background: var(--color-nav-active-bg);
 }
 
 .icon {
   flex: none;
-  color: #c9ced6;
+  color: var(--color-nav-text);
 }
 
 .label {
@@ -186,7 +186,7 @@
   padding: 0 6px;
   border-radius: 11px;
   background: var(--color-badge);
-  color: #fff;
+  color: var(--color-on-badge);
   font-size: 11px;
   font-weight: 700;
   line-height: 22px;

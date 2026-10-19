@@ -1,0 +1,181 @@
+/*
+ * Light theme — matches the original WEBTOP light screenshot (iPhone, measured): white
+ * surfaces, navy app bar with white title and icons, near-black text, a navy active tab,
+ * turquoise selected day, light blue-grey table header and hairline grey grid lines.
+ * Lesson-card tints are computed in src/theme/lessonCardColors.ts.
+ */
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  /* App chrome */
+  --color-safe-area: #f6f6f6;
+  /* Under a translucent status bar iOS draws white text, so the band stays navy there;
+     when iOS draws its own light status bar this band has no height. */
+  --color-safe-area-top: #1d3e61;
+  --color-page: #efefef;
+  --color-appbar: #1d3e61;
+  --color-appbar-deep: #1b3a5c;
+  --color-on-appbar: #ffffff;
+  --color-on-appbar-text: rgb(255 255 255 / 0.92);
+  --color-on-appbar-muted: rgb(255 255 255 / 0.72);
+  --color-on-appbar-subtle: rgb(255 255 255 / 0.85);
+  --color-appbar-icon: #ffffff;
+  --color-on-appbar-outline: rgb(255 255 255 / 0.45);
+  --color-icon-pressed: rgb(0 0 0 / 0.07);
+
+  /* Surfaces */
+  --color-surface: #ffffff;
+  --color-surface-raised: #ffffff;
+  --color-surface-section: #ffffff;
+  --color-surface-tile: #f1f4f8;
+  --color-dialog: #ffffff;
+  --color-dialog-border: #dfe3ea;
+  --color-subpanel: #f6f8fb;
+  --color-card: #ffffff;
+  --color-card-pressed: #f3f5f8;
+  --color-card-border: #dfe3ea;
+  --color-card-top: #ffffff;
+  --color-card-bottom: #fbfcfe;
+  --color-panel-top: #ffffff;
+  --color-panel-bottom: #ffffff;
+  --color-panel-border: #e3e7ee;
+  --color-grid-sticky: #f6f8fb;
+  --color-lesson-chip: #f1f4f8;
+  --color-chip-muted: #eef1f5;
+  --color-media-bg: #e9edf2;
+  --color-nav-bg: #ffffff;
+  --color-nav-border: #e3e7ee;
+  --color-toast-bg: #ffffff;
+  --color-toast-border: #dfe3ea;
+  --color-banner-bg: #eaf1fb;
+  --color-banner-border: #bcd0ea;
+  --color-alert-bg: #e8f0fb;
+  --color-scroll-top-bg: #f1f3f6;
+  --color-fab: #ffffff;
+  --color-on-fab: #1f232b;
+
+  /* Lines */
+  --color-table-header: #eff3f6;
+  --color-table-outline: #e5e7eb;
+  --color-border: #e6e8ee;
+  --color-divider: #e2e5eb;
+  --color-divider-soft: #eceef2;
+  --color-row-divider: #eceff3;
+  --color-input-line: #e1e1e1;
+  --color-tabs-divider: #e2e5eb;
+  --tabs-divider-width: 1px;
+  --color-tile-border: #e1e5eb;
+  --color-empty-border: #c9d0db;
+  --color-empty-border-soft: #d5dbe4;
+  --color-code-box-border: #c9d0db;
+
+  /* Text */
+  --color-text: #1d1d1d;
+  --color-text-strong: #111418;
+  --color-text-title: #1d1d1d;
+  --color-text-secondary: #4b5058;
+  --color-text-muted: #666c75;
+  --color-display-value: #1f1f1f;
+  --color-tab-text: #1d1d1d;
+  --color-table-head-text: #1b1d1f;
+  --color-period-text: #1b1b1b;
+  --color-day-text: #1d1d1d;
+  --color-nav-text: #2b2f36;
+  --color-placeholder: #9aa1ad;
+  --color-empty-text: #9aa3b2;
+  --color-day-outside: #a3a9b3;
+  --color-on-badge: #ffffff;
+  --color-swatch-ring: #1d1d1d;
+
+  /* Lesson cards */
+  --color-card-text: #1a1a1a;
+  --color-card-title: #111111;
+
+  /* Accent and selection */
+  --color-accent: #1d3e61;
+  --color-accent-strong: #1d3e61;
+  --color-accent-pressed: #15304d;
+  --color-on-accent: #ffffff;
+  --color-accent-soft: rgb(29 62 97 / 0.08);
+  --color-accent-soft-strong: rgb(29 62 97 / 0.1);
+  --color-alert-border: rgb(29 62 97 / 0.25);
+  --color-spinner-track: rgb(29 62 97 / 0.2);
+  --color-focus-ring: rgb(29 62 97 / 0.18);
+  --color-selected-bg: #e7eef8;
+  --color-segmented-bg: #eef1f5;
+  --color-segmented-active: #ffffff;
+  --color-tab-on-bg: #ffffff;
+  --color-day-active: #25a89d;
+  --color-on-day-active: #ffffff;
+  --color-day-pressed: rgb(37 168 157 / 0.25);
+  --color-nav-active-bg: rgb(29 62 97 / 0.08);
+  --color-count-bg: rgb(0 0 0 / 0.06);
+  --color-empty-pressed: rgb(0 0 0 / 0.04);
+
+  /* Controls */
+  --color-control-bg: #ffffff;
+  --color-control-border: #cfd5de;
+  --color-input-deep: #ffffff;
+  --color-code-input-bg: #ffffff;
+  --color-code-input-border: #cfd5de;
+  --color-chip-bg: #ffffff;
+  --color-chip-outline: rgb(0 0 0 / 0.25);
+  --color-button-secondary: #eef1f5;
+  --color-button-secondary-border: #d6dbe3;
+  --color-button-secondary-pressed: #e2e7ee;
+
+  /* Status */
+  --color-danger: #c62828;
+  --color-danger-text: #b3261e;
+  --color-danger-text-soft: #b3261e;
+  --color-danger-soft: rgb(198 40 40 / 0.08);
+  --color-danger-soft-pressed: rgb(198 40 40 / 0.16);
+  --color-danger-tint: rgb(198 40 40 / 0.08);
+  --color-danger-faint: rgb(198 40 40 / 0.06);
+  --color-danger-border: rgb(198 40 40 / 0.35);
+  --color-danger-border-soft: rgb(198 40 40 / 0.3);
+  --color-toast-error-border: rgb(198 40 40 / 0.55);
+  --color-badge: #e53935;
+  --color-success: #1e8e5a;
+  --color-success-text: #156b44;
+  --color-success-soft: rgb(30 142 90 / 0.12);
+  --color-toast-success-border: rgb(30 142 90 / 0.45);
+  --color-edit: #8a5a00;
+  --color-edit-border: rgb(168 107 0 / 0.5);
+  --color-edit-pressed: rgb(168 107 0 / 0.12);
+  --color-edit-soft: rgb(168 107 0 / 0.08);
+  --color-edit-border-soft: rgb(168 107 0 / 0.35);
+  --color-editbar-bg: #fff4d6;
+  --color-editbar-border: #f0d58a;
+  --color-editbar-text: #5c4300;
+  --color-warning-text: #7a5200;
+  --color-warning-text-soft: #6b4a00;
+  --color-warning-soft: rgb(168 107 0 / 0.12);
+  --color-warning-tint: rgb(168 107 0 / 0.06);
+  --color-warning-border: rgb(168 107 0 / 0.4);
+  --color-offline-bg: #f6ecfa;
+  --color-offline-border: #e3cdee;
+  --color-offline-text: #5b2a72;
+  --color-offline-outline: rgb(91 42 114 / 0.4);
+
+  /* Brand accents */
+  --color-admin-brand: #127a71;
+  --color-admin-brand-on-bar: #9fe3da;
+  --color-admin-bar-start: #1b3a5c;
+  --color-admin-bar-end: #1d3e61;
+  --color-admin-bar-border: #1d3e61;
+  --color-login-glow: rgb(29 62 97 / 0.12);
+  --color-admin-glow: rgb(37 168 157 / 0.12);
+
+  /* Overlays and shadows */
+  --color-backdrop: rgb(15 23 34 / 0.35);
+  --color-sidebar-backdrop: rgb(15 23 34 / 0.3);
+  --shadow-dialog: 0 12px 40px rgb(15 23 34 / 0.18);
+  --shadow-card: 0 18px 48px rgb(15 23 34 / 0.12);
+  --shadow-toast: 0 6px 24px rgb(15 23 34 / 0.16);
+  --shadow-banner: 0 6px 24px rgb(15 23 34 / 0.16);
+  --shadow-sidebar: 0 0 24px rgb(0 0 0 / 0.25);
+  /* Measured: the display panel has rounded lower corners and a soft drop shadow. */
+  --shadow-display-panel: 0 1px 3px rgb(0 0 0 / 0.28);
+  --display-panel-radius: 8px;
+}

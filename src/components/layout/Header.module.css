@@ -8,7 +8,9 @@
   padding-inline-start: calc(16px + var(--safe-right));
   padding-inline-end: calc(16px + var(--safe-left));
   background: var(--color-appbar);
-  color: var(--color-text-strong);
+  color: var(--color-on-appbar);
+  /* Pressed icon buttons on the navy bar use a light overlay in every theme. */
+  --icon-pressed: rgb(255 255 255 / 0.1);
 }
 
 .menuButton {
@@ -36,7 +38,7 @@
   display: flex;
   align-items: center;
   flex: none;
-  color: #d6e2f3;
+  color: var(--color-appbar-icon);
 }
 
 .actions > button {

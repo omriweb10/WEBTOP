@@ -29,7 +29,7 @@
 }
 
 .selected {
-  border-color: #fff;
+  border-color: var(--color-swatch-ring);
   box-shadow: 0 0 0 2px var(--color-accent);
 }
 
@@ -39,7 +39,7 @@
   gap: 6px;
   min-height: 36px;
   padding: 0 10px 0 4px;
-  border: 1px solid #343c4d;
+  border: 1px solid var(--color-control-border);
   border-radius: 18px;
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);

@@ -7,6 +7,7 @@ import { StartupScreen } from '../features/account/components/StartupScreen';
 import { PrintableWeek } from '../features/timetable/components/PrintableWeek';
 import { UpdateBanner } from '../features/settings/components/UpdateBanner';
 import { onStorageProblem } from '../services/storage/appStorage';
+import { useThemeSync } from '../theme/useThemeSync';
 import { toast } from '../store/uiStore';
 import { RouteView } from './RouteView';
 import { useRoute } from './router';
@@ -35,6 +36,7 @@ function StudentApp() {
  */
 export function App() {
   const route = useRoute();
+  useThemeSync();
 
   // Surface storage problems (unreadable data was quarantined, or a save failed).
   useEffect(

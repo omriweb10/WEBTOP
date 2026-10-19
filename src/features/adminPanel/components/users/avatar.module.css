@@ -40,7 +40,7 @@
   margin: 0 auto;
   overflow: hidden;
   border-radius: 12px;
-  background: #0d1118;
+  background: var(--color-media-bg);
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -70,7 +70,7 @@
   display: block;
   flex: none;
   overflow: hidden;
-  background: #0d1118;
+  background: var(--color-media-bg);
 }
 
 .view {
@@ -105,7 +105,7 @@
   height: var(--touch-target);
   border: 0;
   border-radius: 50%;
-  background: #222937;
+  background: var(--color-chip-muted);
   color: var(--color-text);
 }
 

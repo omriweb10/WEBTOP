@@ -187,3 +187,27 @@ test('sessions dashboard shows the live session and force-disconnects it', async
   expect(session).toEqual({ status: 'ended', end_reason: 'admin_disconnect' });
   expect((await login.client.rpc('get_my_bundle')).error?.code).toBe('42501');
 });
+
+test('the admin bar offers the theme choice and the whole panel follows it', async ({ page }) => {
+  await signInAdmin(page);
+  const css = (selector: string, property: string) =>
+    page.locator(selector).first().evaluate((el, p) => getComputedStyle(el).getPropertyValue(p), property);
+  const choices = page.getByRole('radiogroup', { name: 'ערכת נושא' });
+  await expect(choices.getByRole('radio', { name: 'ערכת נושא: כהה' })).toHaveAttribute('aria-checked', 'true');
+
+  await choices.getByRole('radio', { name: 'ערכת נושא: בהיר' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  expect(await css('nav[aria-label="אזורי ניהול"]', 'background-color')).toBe('rgb(255, 255, 255)');
+  expect(await css('main input[type="search"]', 'background-color')).toBe('rgb(255, 255, 255)');
+  expect(await css('main h1', 'color')).toBe('rgb(17, 20, 24)');
+
+  // Remembered after a restart, and the forms and dialogs follow it too.
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await page.getByRole('button', { name: 'משתמש חדש' }).click();
+  expect(await css('dialog[open] > div', 'background-color')).toBe('rgb(255, 255, 255)');
+  await page.getByRole('dialog').getByRole('button', { name: 'ביטול' }).click();
+
+  await choices.getByRole('radio', { name: 'ערכת נושא: כהה' }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+});

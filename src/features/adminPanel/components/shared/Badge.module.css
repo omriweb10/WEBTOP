@@ -18,26 +18,26 @@
 }
 
 .neutral {
-  background: #252c3a;
+  background: var(--color-button-secondary);
   color: var(--color-text-secondary);
 }
 
 .success {
-  background: rgb(79 192 141 / 0.14);
-  color: #6fdcaa;
+  background: var(--color-success-soft);
+  color: var(--color-success-text);
 }
 
 .info {
-  background: rgb(130 177 242 / 0.14);
+  background: var(--color-accent-soft-strong);
   color: var(--color-accent-strong);
 }
 
 .warning {
-  background: rgb(242 184 75 / 0.14);
-  color: #f6cf86;
+  background: var(--color-warning-soft);
+  color: var(--color-warning-text);
 }
 
 .danger {
-  background: rgb(242 107 107 / 0.14);
-  color: #ff9c9c;
+  background: var(--color-danger-soft);
+  color: var(--color-danger-text);
 }

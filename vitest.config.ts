@@ -8,7 +8,7 @@ export default defineConfig({
     __BUILD_TIME__: JSON.stringify('1970-01-01T00:00:00.000Z'),
   },
   test: {
-    include: ['tests/unit/**/*.test.{ts,tsx}'],
+    include: ['tests/unit/**/*.test.{ts,tsx}', 'tests/functions/**/*.test.ts'],
     environment: 'jsdom',
     restoreMocks: true,
   },

@@ -3,10 +3,22 @@
   "compilerOptions": {
     "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "jsx": "react-jsx",
-    "types": ["vite/client"]
+    "types": [
+      "vite/client"
+    ]
   },
-  "include": ["src", "tests/unit"],
-  "exclude": ["src/sw"]
+  "include": [
+    "src",
+    "tests/unit",
+    "supabase/functions/_shared/accessCode.ts"
+  ],
+  "exclude": [
+    "src/sw"
+  ]
 }

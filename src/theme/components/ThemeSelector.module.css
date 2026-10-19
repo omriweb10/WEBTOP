@@ -1,0 +1,60 @@
+.group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--color-segmented-bg);
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  touch-action: manipulation;
+}
+
+.selected {
+  background: var(--color-segmented-active);
+  color: var(--color-text-strong);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.12);
+}
+
+.hint {
+  margin: 8px 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* Compact: three icon buttons on the navy app bar (white icons in every theme). */
+.compactWrap {
+  flex: none;
+}
+
+.compact {
+  gap: 2px;
+  padding: 2px;
+  background: rgb(255 255 255 / 0.1);
+}
+
+.compact .option {
+  width: 34px;
+  min-height: 32px;
+  padding: 0;
+  color: var(--color-on-appbar-muted);
+}
+
+.compact .selected {
+  background: rgb(255 255 255 / 0.18);
+  color: var(--color-on-appbar);
+  box-shadow: none;
+}

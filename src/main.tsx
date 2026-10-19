@@ -6,6 +6,8 @@ import { requestPersistentStorage } from './services/storage/appStorage';
 import { recordLaunch } from './services/session/launchTracker';
 import './styles/fonts.css';
 import './styles/tokens.css';
+import './styles/themes/dark.css';
+import './styles/themes/light.css';
 import './styles/global.css';
 
 recordLaunch();

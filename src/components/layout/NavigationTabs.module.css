@@ -5,7 +5,7 @@
   grid-auto-flow: column;
   flex: none;
   background: var(--color-surface);
-  border-bottom: 2px solid #2a303c;
+  border-bottom: var(--tabs-divider-width) solid var(--color-tabs-divider);
 }
 
 .tab {
@@ -14,7 +14,7 @@
   padding: 0 4px;
   border: 0;
   background: transparent;
-  color: #d7dde6;
+  color: var(--color-tab-text);
   font-size: var(--font-size-sm);
   font-weight: 400;
   white-space: nowrap;
@@ -35,7 +35,7 @@
 }
 
 .tab:active {
-  background: #1d2e47;
+  background: var(--color-selected-bg);
 }
 
 .selected {

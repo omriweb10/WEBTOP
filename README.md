@@ -17,9 +17,9 @@ It runs in one of two modes, chosen at build time:
   signed in until they log out or an admin disconnects them. Setup:
   [docs/supabase-setup.md](docs/supabase-setup.md).
 
-| Timetable | Sidebar | Lesson editor (edit mode) |
-|---|---|---|
-| ![timetable](docs/screenshots/timetable.png) | ![sidebar](docs/screenshots/sidebar.png) | ![editor](docs/screenshots/lesson-editor.png) |
+| Timetable | Light mode | Sidebar | Lesson editor (edit mode) |
+|---|---|---|---|
+| ![timetable](docs/screenshots/timetable.png) | ![timetable, light](docs/screenshots/timetable-light.png) | ![sidebar](docs/screenshots/sidebar.png) | ![editor](docs/screenshots/lesson-editor.png) |
 
 *(Screenshots show the built-in **fictional example data**.)*
 
@@ -44,6 +44,11 @@ It runs in one of two modes, chosen at build time:
   - undo destructive edits from the confirmation toast.
 - **PWA**: standalone display, safe-area aware, Apple touch icon and launch images, offline
   after the first load, and a versioned service worker with an update banner.
+- **Light, Dark and System appearance** (Settings → מראה, and in the admin bar). Dark is the
+  original design and the default; Light reproduces the original WEBTOP light screenshot (pastel
+  lesson cards with the same subject edge colours); System follows the device and changes live.
+  The choice is remembered on the device and applied before the first paint, so the app never
+  flashes the wrong theme.
 
 ### Account mode (Supabase)
 
@@ -232,7 +237,10 @@ src/
 │   └── session/         Local launch tracking
 ├── store/               Persisted zustand stores (one per data slice) + UI store
 ├── sw/                  Service worker (separate tsconfig with WebWorker lib)
-├── styles/              tokens.css (all colours/sizes/typography), tokens.ts, fonts, globals
+├── theme/               Appearance: config, pure resolution, persisted preference, DOM application
+│                        (data-theme + chrome metas), system subscription, card tints, ThemeSelector
+├── styles/              tokens.css (sizes/typography/motion), themes/dark.css + themes/light.css
+│                        (every colour as a semantic token), fonts, globals
 ├── data/                Default periods, presets, fictional example timetable
 └── utils/               Dates, Hebrew calendar numerals, time, colour mixing, ids
 tests/unit/              Vitest (app domain rules)
@@ -252,8 +260,20 @@ Design rules followed:
   use-case modules (`*Actions.ts`) and never contain timetable rules.
 - Persistence sits behind the storage service. Every value is validated **on load, on save and
   on import**.
-- Display tokens are centralised in `src/styles/tokens.css` (and the few needed in TS in
-  `tokens.ts`).
+- Display tokens are centralised: sizes and typography in `src/styles/tokens.css`, colours as
+  semantic tokens in `src/styles/themes/dark.css` and `light.css`. Components never contain
+  literal colours (a unit test enforces this), so a theme is just a set of token values.
+
+### Themes and iOS
+
+- `index.html` runs a tiny inline script before any CSS or app code: it reads the saved
+  preference, sets `<html data-theme>`, and updates `theme-color`, `color-scheme` and the iOS
+  status-bar style. `tests/unit/theme.test.ts` runs that script against the app's own resolver.
+- Dark keeps the translucent iOS status bar over the app's dark band (unchanged). Light asks iOS
+  for its light status bar with dark text; iOS reads that setting when the Home Screen app
+  launches, so after switching theme inside a running app the band under the status bar stays
+  navy (legible white status text) until the next launch.
+- The manifest colours and launch images stay dark: they are fixed at install time.
 
 ### Backup file format
 

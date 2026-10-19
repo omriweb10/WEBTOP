@@ -16,9 +16,9 @@
 .panel {
   display: flex;
   flex-direction: column;
-  background: #1e2431;
-  border: 1px solid #2b3242;
-  box-shadow: 0 12px 40px rgb(0 0 0 / 0.45);
+  background: var(--color-dialog);
+  border: 1px solid var(--color-dialog-border);
+  box-shadow: var(--shadow-dialog);
   overflow: hidden;
 }
 

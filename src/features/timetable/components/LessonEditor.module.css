@@ -32,8 +32,8 @@
   margin-bottom: 12px;
   padding: 10px 12px;
   border-radius: 10px;
-  background: rgb(242 184 75 / 0.1);
-  border: 1px solid rgb(242 184 75 / 0.35);
+  background: var(--color-edit-soft);
+  border: 1px solid var(--color-edit-border-soft);
   font-size: var(--font-size-sm);
   line-height: 1.5;
 }
@@ -48,7 +48,7 @@
   padding: 12px;
   border-radius: 12px;
   border: 1px solid var(--color-border);
-  background: #191f2b;
+  background: var(--color-subpanel);
 }
 
 .row {
@@ -71,7 +71,7 @@
   margin-bottom: 12px;
   padding: 3px;
   border-radius: 10px;
-  background: #121722;
+  background: var(--color-segmented-bg);
 }
 
 .segment,
@@ -86,6 +86,6 @@
 }
 
 .segmentOn {
-  background: #2a3346;
+  background: var(--color-segmented-active);
   color: var(--color-text-strong);
 }

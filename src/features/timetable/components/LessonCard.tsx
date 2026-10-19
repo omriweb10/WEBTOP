@@ -1,8 +1,7 @@
-import type { CSSProperties } from 'react';
 import type { Lesson } from '../../../schemas/timetable';
-import { CARD_TINT_RATIO, SURFACE_COLOR } from '../../../styles/tokens';
+import { lessonCardStyle } from '../../../theme/lessonCardColors';
+import { useResolvedTheme } from '../../../theme/useResolvedTheme';
 import { cx } from '../../../utils/classNames';
-import { mixHex } from '../../../utils/color';
 import styles from './LessonCard.module.css';
 
 interface LessonCardProps {
@@ -14,16 +13,9 @@ interface LessonCardProps {
   className?: string;
 }
 
-/** Card colours: accent edge plus the accent mixed into the table surface. */
-export function lessonCardStyle(color: string): CSSProperties {
-  return {
-    '--lesson-accent': color,
-    backgroundColor: mixHex(color, SURFACE_COLOR, CARD_TINT_RATIO),
-  } as CSSProperties;
-}
-
 /** One lesson: bold subject, teacher and "חדר: …" lines, centred, with a coloured edge. */
 export function LessonCard({ lesson, onActivate, actionLabel, className }: LessonCardProps) {
+  const style = lessonCardStyle(lesson.color, useResolvedTheme());
   const content = (
     <>
       <span className={styles.subject}>{lesson.subject}</span>
@@ -37,7 +29,7 @@ export function LessonCard({ lesson, onActivate, actionLabel, className }: Lesso
       <button
         type="button"
         className={cx(styles.card, styles.interactive, className)}
-        style={lessonCardStyle(lesson.color)}
+        style={style}
         onClick={onActivate}
         aria-label={actionLabel ? `${actionLabel}: ${lesson.subject}` : undefined}
       >
@@ -46,7 +38,7 @@ export function LessonCard({ lesson, onActivate, actionLabel, className }: Lesso
     );
   }
   return (
-    <div className={cx(styles.card, className)} style={lessonCardStyle(lesson.color)}>
+    <div className={cx(styles.card, className)} style={style}>
       {content}
     </div>
   );

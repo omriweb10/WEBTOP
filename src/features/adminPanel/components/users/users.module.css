@@ -23,15 +23,15 @@
   width: 100%;
   min-height: 72px;
   padding: 10px 14px;
-  border: 1px solid #252d3c;
+  border: 1px solid var(--color-panel-border);
   border-radius: 14px;
-  background: #181e29;
+  background: var(--color-card);
   color: inherit;
   text-align: start;
 }
 
 .row:active {
-  background: #1d2431;
+  background: var(--color-card-pressed);
 }
 
 .rowText {
@@ -139,7 +139,7 @@
   padding: 4px;
   overflow-x: auto;
   border-radius: 12px;
-  background: #121722;
+  background: var(--color-segmented-bg);
   scrollbar-width: none;
 }
 
@@ -157,7 +157,7 @@
 }
 
 .tabOn {
-  background: #253047;
+  background: var(--color-tab-on-bg);
   color: var(--color-text-strong);
 }
 
@@ -193,7 +193,7 @@
 }
 
 .dangerZone {
-  border-color: rgb(242 107 107 / 0.3);
+  border-color: var(--color-danger-border-soft);
 }
 
 .checkList {
@@ -216,7 +216,7 @@
   gap: 10px;
   min-height: 48px;
   padding: 6px 12px;
-  border: 1px solid #252d3c;
+  border: 1px solid var(--color-panel-border);
   border-radius: 12px;
   cursor: pointer;
 }

@@ -27,21 +27,21 @@
 
 .primary {
   background: var(--color-accent);
-  color: #0b1a2e;
+  color: var(--color-on-accent);
 }
 
 .primary:active:not(:disabled) {
-  background: #6a9ee6;
+  background: var(--color-accent-pressed);
 }
 
 .secondary {
-  background: #252c3a;
-  border-color: #323a4b;
+  background: var(--color-button-secondary);
+  border-color: var(--color-button-secondary-border);
   color: var(--color-text);
 }
 
 .secondary:active:not(:disabled) {
-  background: #2d3546;
+  background: var(--color-button-secondary-pressed);
 }
 
 .ghost {
@@ -50,15 +50,15 @@
 }
 
 .ghost:active:not(:disabled) {
-  background: rgb(130 177 242 / 0.12);
+  background: var(--color-accent-soft);
 }
 
 .danger {
-  background: rgb(242 107 107 / 0.14);
-  border-color: rgb(242 107 107 / 0.35);
+  background: var(--color-danger-soft);
+  border-color: var(--color-danger-border);
   color: var(--color-danger);
 }
 
 .danger:active:not(:disabled) {
-  background: rgb(242 107 107 / 0.24);
+  background: var(--color-danger-soft-pressed);
 }

@@ -5,7 +5,7 @@
   background: var(--color-appbar);
   font-size: var(--font-size-base);
   text-align: center;
-  color: var(--color-text);
+  color: var(--color-on-appbar-text);
 }
 
 .scroll {
@@ -77,7 +77,7 @@
   width: 90px;
   height: 88px;
   padding: 0;
-  border: 1px solid #333c4d;
+  border: 1px solid var(--color-tile-border);
   border-radius: 6px;
   background: var(--color-surface-tile);
   overflow: hidden;
@@ -91,7 +91,7 @@
 
 .tileLabel {
   padding: 4px 2px;
-  background: #222937;
+  background: var(--color-chip-muted);
   font-size: 10px;
   font-weight: 700;
   line-height: 1.2;
@@ -113,7 +113,7 @@
 }
 
 .lesson + .lesson {
-  border-top: 1px solid #222833;
+  border-top: 1px solid var(--color-divider-soft);
 }
 
 .lessonSubject {

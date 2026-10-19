@@ -1,9 +1,13 @@
 /* Measured: 64pt panel; label 10pt at ~18pt; value 13pt at ~37pt; underline at ~54pt. */
 .panel {
+  position: relative;
+  z-index: 1;
   flex: none;
   height: var(--display-panel-height);
   padding: 0 var(--page-gutter);
+  border-radius: 0 0 var(--display-panel-radius) var(--display-panel-radius);
   background: var(--color-surface);
+  box-shadow: var(--shadow-display-panel);
 }
 
 .field {
@@ -28,7 +32,7 @@
   inset-inline-end: 32px;
   font-size: var(--font-size-md);
   line-height: 18px;
-  color: #d7dde4;
+  color: var(--color-display-value);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

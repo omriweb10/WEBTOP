@@ -1,0 +1,179 @@
+/*
+ * Dark theme — the original WEBTOP-inspired appearance, and the default. Every value here
+ * is exactly what the components used before theming, so the dark UI is unchanged.
+ * themes/light.css overrides the same tokens under :root[data-theme='light'].
+ */
+:root {
+  color-scheme: dark;
+
+  /* App chrome */
+  --color-safe-area: #12161c; /* home-indicator band and the gaps between panels */
+  --color-safe-area-top: #12161c; /* status-bar band (standalone, translucent status bar) */
+  --color-page: #12161c;
+  --color-appbar: #14263c;
+  --color-appbar-deep: #0f2135; /* sidebar header */
+  --color-on-appbar: #fbfdff; /* titles and names on the navy bars */
+  --color-on-appbar-text: #dde1e7; /* body text on the navy bars */
+  --color-on-appbar-muted: #9097a2;
+  --color-on-appbar-subtle: #c9ced4;
+  --color-appbar-icon: #d6e2f3;
+  --color-on-appbar-outline: rgb(255 255 255 / 0.35);
+  --color-icon-pressed: rgb(255 255 255 / 0.1);
+
+  /* Surfaces */
+  --color-surface: #191e29; /* tabs, display panel, table area, cards */
+  --color-surface-raised: #1b1f27; /* day selector bar */
+  --color-surface-section: #181e26; /* notices sections */
+  --color-surface-tile: #2b3343; /* home shortcut tiles */
+  --color-dialog: #1e2431;
+  --color-dialog-border: #2b3242;
+  --color-subpanel: #191f2b;
+  --color-card: #181e29;
+  --color-card-pressed: #1d2431;
+  --color-card-border: #263044;
+  --color-card-top: #1a2231; /* login cards (gradient) */
+  --color-card-bottom: #161c27;
+  --color-panel-top: #19202c; /* admin panels (gradient) */
+  --color-panel-bottom: #171c26;
+  --color-panel-border: #252d3c;
+  --color-grid-sticky: #1a202b;
+  --color-lesson-chip: #222a38;
+  --color-chip-muted: #222937;
+  --color-media-bg: #0d1118;
+  --color-nav-bg: #151a24;
+  --color-nav-border: #222a38;
+  --color-toast-bg: #2a3242;
+  --color-toast-border: #3a4457;
+  --color-banner-bg: #1d3352;
+  --color-banner-border: #335b8f;
+  --color-alert-bg: #18263b;
+  --color-scroll-top-bg: #e6e8ec;
+  --color-fab: #ffffff;
+  --color-on-fab: #1f232b;
+
+  /* Lines */
+  --color-table-header: #252d3c;
+  --color-table-outline: #272f3f;
+  --color-border: #2d323f; /* table grid lines */
+  --color-divider: #262b37;
+  --color-divider-soft: #222833;
+  --color-row-divider: #222937;
+  --color-input-line: #353a47;
+  --color-tabs-divider: #2a303c;
+  --tabs-divider-width: 2px;
+  --color-tile-border: #333c4d;
+  --color-empty-border: #3a4253;
+  --color-empty-border-soft: #2c3445;
+  --color-code-box-border: #3d4a63;
+
+  /* Text */
+  --color-text: #dde1e7;
+  --color-text-strong: #fbfdff;
+  --color-text-title: #e5e9ef; /* section and list-item titles */
+  --color-text-secondary: #c9ced4;
+  /* Reference label is ~#393e49 (contrast 1.6:1); raised for WCAG AA legibility. */
+  --color-text-muted: #9097a2;
+  --color-display-value: #d7dde4;
+  --color-tab-text: #d7dde6;
+  --color-table-head-text: #dbe3f0;
+  --color-period-text: #e0e5eb;
+  --color-day-text: #dce0e8;
+  --color-nav-text: #c9ced6;
+  --color-placeholder: #4a5366;
+  --color-empty-text: #4f5a70;
+  --color-day-outside: #545b68;
+  --color-on-badge: #ffffff;
+  --color-swatch-ring: #ffffff;
+
+  /* Lesson cards: text over the subject tint (the tint itself is computed per theme) */
+  --color-card-text: #e0e4ec;
+  --color-card-title: #e3e7ee;
+
+  /* Accent and selection */
+  --color-accent: #82b1f2; /* active tab, links, active sidebar item bar */
+  --color-accent-strong: #a8caf6; /* active sidebar item text */
+  --color-accent-pressed: #6a9ee6;
+  --color-on-accent: #0b1a2e;
+  --color-accent-soft: rgb(130 177 242 / 0.12);
+  --color-accent-soft-strong: rgb(130 177 242 / 0.14);
+  --color-alert-border: rgb(130 177 242 / 0.4);
+  --color-spinner-track: rgb(130 177 242 / 0.25);
+  --color-focus-ring: rgb(130 177 242 / 0.2);
+  --color-selected-bg: #1d2e47;
+  --color-segmented-bg: #121722;
+  --color-segmented-active: #2a3346;
+  --color-tab-on-bg: #253047;
+  --color-day-active: #45aba0;
+  --color-on-day-active: #062b27;
+  --color-day-pressed: rgb(69 171 160 / 0.35);
+  --color-nav-active-bg: rgb(255 255 255 / 0.06);
+  --color-count-bg: rgb(255 255 255 / 0.08);
+  --color-empty-pressed: rgb(255 255 255 / 0.05);
+
+  /* Controls */
+  --color-control-bg: #151a24;
+  --color-control-border: #343c4d;
+  --color-input-deep: #121722;
+  --color-code-input-bg: #10151e;
+  --color-code-input-border: #36405a;
+  --color-chip-bg: #1a202b;
+  --color-chip-outline: rgb(255 255 255 / 0.3);
+  --color-button-secondary: #252c3a;
+  --color-button-secondary-border: #323a4b;
+  --color-button-secondary-pressed: #2d3546;
+
+  /* Status */
+  --color-danger: #f26b6b;
+  --color-danger-text: #ff9c9c;
+  --color-danger-text-soft: #ffb4b4;
+  --color-danger-soft: rgb(242 107 107 / 0.14);
+  --color-danger-soft-pressed: rgb(242 107 107 / 0.24);
+  --color-danger-tint: rgb(242 107 107 / 0.12);
+  --color-danger-faint: rgb(242 107 107 / 0.08);
+  --color-danger-border: rgb(242 107 107 / 0.35);
+  --color-danger-border-soft: rgb(242 107 107 / 0.3);
+  --color-toast-error-border: rgb(242 107 107 / 0.6);
+  --color-badge: #f75f67;
+  --color-success: #4fc08d;
+  --color-success-text: #6fdcaa;
+  --color-success-soft: rgb(79 192 141 / 0.14);
+  --color-toast-success-border: rgb(79 192 141 / 0.45);
+  --color-edit: #f2b84b; /* edit-mode indicator */
+  --color-edit-border: rgb(242 184 75 / 0.5);
+  --color-edit-pressed: rgb(242 184 75 / 0.15);
+  --color-edit-soft: rgb(242 184 75 / 0.1);
+  --color-edit-border-soft: rgb(242 184 75 / 0.35);
+  --color-editbar-bg: #3a2f12;
+  --color-editbar-border: #5b4a1c;
+  --color-editbar-text: #f7e3b5;
+  --color-warning-text: #f6cf86;
+  --color-warning-text-soft: #f6dfae;
+  --color-warning-soft: rgb(242 184 75 / 0.14);
+  --color-warning-tint: rgb(242 184 75 / 0.08);
+  --color-warning-border: rgb(242 184 75 / 0.4);
+  --color-offline-bg: #2a2131;
+  --color-offline-border: #47354f;
+  --color-offline-text: #e8d3f0;
+  --color-offline-outline: rgb(232 211 240 / 0.45);
+
+  /* Brand accents */
+  --color-admin-brand: #7fd1c7;
+  --color-admin-brand-on-bar: #7fd1c7;
+  --color-admin-bar-start: #13283d;
+  --color-admin-bar-end: #14263c;
+  --color-admin-bar-border: #1f3550;
+  --color-login-glow: rgb(46 90 138 / 0.35);
+  --color-admin-glow: rgb(69 171 160 / 0.18);
+  --avatar-gradient: linear-gradient(145deg, #2b4a73, #1d3352);
+
+  /* Overlays and shadows */
+  --color-backdrop: rgb(6 9 14 / 0.45);
+  --color-sidebar-backdrop: rgb(8 11 16 / 0.35);
+  --shadow-dialog: 0 12px 40px rgb(0 0 0 / 0.45);
+  --shadow-card: 0 24px 60px rgb(0 0 0 / 0.45);
+  --shadow-toast: 0 6px 24px rgb(0 0 0 / 0.4);
+  --shadow-banner: 0 6px 24px rgb(0 0 0 / 0.45);
+  --shadow-sidebar: 0 0 24px rgb(0 0 0 / 0.5);
+  --shadow-display-panel: none;
+  --display-panel-radius: 0;
+}

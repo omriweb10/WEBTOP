@@ -76,6 +76,9 @@ const ICONS = {
   rotate: 'rotate_right',
   campaign: 'campaign',
   assignment: 'assignment_ind',
+  lightMode: 'light_mode',
+  darkMode: 'dark_mode',
+  themeAuto: 'brightness_auto',
 };
 
 const dir = process.argv[2];

@@ -5,9 +5,9 @@
   flex: none;
   min-height: 40px;
   padding: 4px 12px 4px 8px;
-  background: #3a2f12;
-  border-bottom: 1px solid #5b4a1c;
-  color: #f7e3b5;
+  background: var(--color-editbar-bg);
+  border-bottom: 1px solid var(--color-editbar-border);
+  color: var(--color-editbar-text);
 }
 
 .icon {
@@ -27,7 +27,7 @@
   min-height: 32px;
   min-width: 44px;
   padding: 0 10px;
-  border: 1px solid rgb(242 184 75 / 0.5);
+  border: 1px solid var(--color-edit-border);
   border-radius: 8px;
   background: transparent;
   color: var(--color-edit);
@@ -36,5 +36,5 @@
 }
 
 .button:active {
-  background: rgb(242 184 75 / 0.15);
+  background: var(--color-edit-pressed);
 }

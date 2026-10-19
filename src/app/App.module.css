@@ -15,7 +15,7 @@
 .safeTop {
   flex: none;
   height: var(--safe-top);
-  background: var(--color-safe-area);
+  background: var(--color-safe-area-top);
 }
 
 .screen {

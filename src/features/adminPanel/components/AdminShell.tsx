@@ -2,6 +2,7 @@ import { navigate, useRoute, type AdminSection } from '../../../app/router';
 import { Icon } from '../../../components/ui/Icon';
 import { IconButton } from '../../../components/ui/IconButton';
 import type { IconName } from '../../../components/ui/icons/iconPaths';
+import { ThemeSelector } from '../../../theme/components/ThemeSelector';
 import { cx } from '../../../utils/classNames';
 import { useAdminAuth } from '../state/adminAuthStore';
 import { ContentSection } from './content/ContentSection';
@@ -36,6 +37,7 @@ export function AdminShell() {
         <span className={styles.email} dir="ltr">
           {email}
         </span>
+        <ThemeSelector variant="compact" />
         <IconButton icon="logout" label="התנתקות מממשק הניהול" onClick={() => void signOut()} />
       </header>
       <nav className={styles.nav} aria-label="אזורי ניהול">

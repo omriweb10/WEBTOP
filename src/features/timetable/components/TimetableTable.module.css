@@ -6,7 +6,7 @@
   width: 100%;
   border-collapse: collapse;
   table-layout: fixed;
-  border: 1px solid #272f3f;
+  border: 1px solid var(--color-table-outline);
   font-size: var(--font-size-sm);
   line-height: var(--line-height-dense);
   animation: day-in var(--duration-medium) var(--ease-standard);
@@ -24,7 +24,7 @@
   height: var(--table-header-height);
   padding: 0 4px;
   background: var(--color-table-header);
-  color: #dbe3f0;
+  color: var(--color-table-head-text);
   font-weight: 700;
   text-align: center;
   border: 1px solid var(--color-border);
@@ -38,7 +38,7 @@
 .period {
   padding: var(--period-padding) 2px;
   border: 1px solid var(--color-border);
-  color: #e0e5eb;
+  color: var(--color-period-text);
   font-weight: 700;
   text-align: center;
   white-space: nowrap;

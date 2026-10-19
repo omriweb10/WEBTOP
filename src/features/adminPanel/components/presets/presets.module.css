@@ -17,10 +17,10 @@
   flex-direction: column;
   gap: 10px;
   padding: 14px;
-  border: 1px solid #252d3c;
+  border: 1px solid var(--color-panel-border);
   border-inline-start: 6px solid var(--color-accent);
   border-radius: 14px;
-  background: #181e29;
+  background: var(--color-card);
 }
 
 .cardText {

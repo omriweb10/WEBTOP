@@ -5,8 +5,8 @@
   justify-content: center;
   overflow: hidden;
   border-radius: 50%;
-  background: linear-gradient(145deg, #2b4a73, #1d3352);
-  color: var(--color-text-strong);
+  background: var(--avatar-gradient);
+  color: var(--color-on-appbar);
   font-weight: 700;
   line-height: 1;
   user-select: none;

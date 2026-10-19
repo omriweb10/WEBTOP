@@ -32,5 +32,5 @@
 }
 
 .fab:active {
-  background: #e6e8ec;
+  background: var(--color-scroll-top-bg);
 }

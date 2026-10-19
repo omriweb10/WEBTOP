@@ -15,9 +15,9 @@
   width: 100%;
   min-height: var(--touch-target);
   padding: 10px 40px;
-  border: 1px solid #343c4d;
+  border: 1px solid var(--color-control-border);
   border-radius: 12px;
-  background: #121722;
+  background: var(--color-input-deep);
   color: var(--color-text);
   appearance: none;
 }
@@ -58,7 +58,7 @@
   gap: 6px;
   min-height: 34px;
   padding: 0 12px;
-  border: 1px solid #323a4b;
+  border: 1px solid var(--color-button-secondary-border);
   border-radius: 999px;
   background: transparent;
   color: var(--color-text-secondary);
@@ -68,7 +68,7 @@
 
 .chipOn {
   border-color: var(--color-accent);
-  background: rgb(130 177 242 / 0.14);
+  background: var(--color-accent-soft-strong);
   color: var(--color-accent-strong);
 }
 
@@ -76,7 +76,7 @@
   min-width: 20px;
   padding: 0 5px;
   border-radius: 999px;
-  background: rgb(255 255 255 / 0.08);
+  background: var(--color-count-bg);
   font-size: var(--font-size-sm);
   text-align: center;
 }

@@ -29,3 +29,6 @@ Thumbs.db
 
 # Local Supabase-equivalent test stack (binaries, data, generated keys)
 .local-stack/
+
+# Database backups made while upgrading the project (private data)
+backup*.sql

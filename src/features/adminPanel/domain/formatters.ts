@@ -1,4 +1,4 @@
-/** Date/time wording used across the admin panel. */
+/** Date/time and other wording used across the admin panel. */
 
 /** "19/10/2026 14:05" (Hebrew locale), or a dash. */
 export function formatDateTime(iso: string | null | undefined): string {
@@ -47,4 +47,15 @@ export function endReasonLabel(reason: string | null): string {
     default:
       return '—';
   }
+}
+
+/** "מורה · חדר 12", or a fallback when neither is set. */
+export function presetDetails(preset: { teacher: string; room: string }, fallback = 'ללא מורה וחדר'): string {
+  return [preset.teacher, preset.room && `חדר ${preset.room}`].filter(Boolean).join(' · ') || fallback;
+}
+
+/** How many lessons use a preset, in words. */
+export function lessonUsageLabel(count: number): string {
+  if (count <= 0) return 'לא משובץ';
+  return count === 1 ? 'משובץ בשיעור אחד' : `משובץ ב‑${count} שיעורים`;
 }

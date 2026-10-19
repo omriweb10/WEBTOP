@@ -16,7 +16,7 @@ import styles from './AdminShell.module.css';
 const SECTIONS: ReadonlyArray<{ id: AdminSection; label: string; icon: IconName }> = [
   { id: 'users', label: 'משתמשים', icon: 'group' },
   { id: 'sessions', label: 'חיבורים', icon: 'devices' },
-  { id: 'presets', label: 'מקצועות', icon: 'palette' },
+  { id: 'presets', label: 'מאגר', icon: 'palette' },
   { id: 'templates', label: 'תבניות', icon: 'tableChart' },
   { id: 'content', label: 'הודעות', icon: 'campaign' },
 ];

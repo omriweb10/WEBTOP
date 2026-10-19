@@ -1,44 +1,58 @@
-/** Subject presets and which students may use them. */
+/**
+ * Subject presets. Each student owns an independent list; the library (no owner) holds
+ * the admin's presets for templates and as a source to copy from. Students never see it.
+ */
 import { db, unwrap } from './adminClient';
 import type { PresetFields, PresetRow } from './types';
 
-/** All presets, archived ones included. */
-export async function listPresets(): Promise<PresetRow[]> {
-  return unwrap<PresetRow[]>(db().from('subject_presets').select('*').order('name'));
+const OVERVIEW = 'admin_preset_overview';
+
+/** Library presets (archived ones included), with template usage. */
+export async function listLibraryPresets(): Promise<PresetRow[]> {
+  return unwrap<PresetRow[]>(db().from(OVERVIEW).select('*').is('profile_id', null).order('name'));
 }
 
-/** Creates a preset; returns it. */
-export async function createPreset(fields: PresetFields): Promise<PresetRow> {
-  return unwrap<PresetRow>(db().from('subject_presets').insert(fields).select('*').single());
+/** One student's own presets (archived ones included), with lesson usage. */
+export async function listUserPresets(profileId: string): Promise<PresetRow[]> {
+  return unwrap<PresetRow[]>(db().from(OVERVIEW).select('*').eq('profile_id', profileId).order('name').order('created_at'));
 }
 
-/** Updates a preset (students see the change; their timetables keep the placement). */
+/** Creates a preset in a student's list (profileId) or in the library (null). */
+export async function createPreset(profileId: string | null, fields: PresetFields): Promise<void> {
+  await unwrap(db().from('subject_presets').insert({ ...fields, profile_id: profileId }));
+}
+
+/** Updates a preset; only its owner (or the library's templates) is affected. */
 export async function updatePreset(id: string, fields: Partial<PresetFields>): Promise<void> {
   await unwrap(db().from('subject_presets').update(fields).eq('id', id));
 }
 
-/** Archives or restores a preset (archived presets cannot be newly placed). */
+/** Hides (archives) or restores a preset: archived presets cannot be newly placed. */
 export async function setPresetArchived(id: string, archived: boolean): Promise<void> {
   await unwrap(db().from('subject_presets').update({ archived_at: archived ? new Date().toISOString() : null }).eq('id', id));
 }
 
-/** Deletes an unused preset (the database refuses while it is placed anywhere). */
-export async function deletePreset(id: string): Promise<void> {
-  await unwrap(db().from('subject_presets').delete().eq('id', id));
+/**
+ * Copies presets (from the library or another student) into each target student's list
+ * as new, independent presets. Returns how many were created.
+ */
+export async function copyPresets(presetIds: readonly string[], profileIds: readonly string[]): Promise<number> {
+  return unwrap<number>(db().rpc('admin_copy_presets', { p_preset_ids: presetIds, p_profile_ids: profileIds }));
 }
 
-/** Preset ids a student may use. */
-export async function listUserPresetIds(profileId: string): Promise<string[]> {
-  const rows = await unwrap<Array<{ preset_id: string }>>(db().from('profile_presets').select('preset_id').eq('profile_id', profileId));
-  return rows.map((r) => r.preset_id);
-}
+/** What happens to the lessons of a preset that is being removed while still placed. */
+export type LessonsOnRemoval = { kind: 'none' } | { kind: 'delete' } | { kind: 'replace'; replacementId: string };
 
-/** Replaces the set of presets a student may use. */
-export async function setUserPresets(profileId: string, presetIds: readonly string[]): Promise<void> {
-  await unwrap(db().rpc('admin_set_profile_presets', { p_profile_id: profileId, p_preset_ids: presetIds }));
-}
-
-/** Makes one preset available to several students; returns how many gained it. */
-export async function addPresetToUsers(presetId: string, profileIds: readonly string[]): Promise<number> {
-  return unwrap<number>(db().rpc('admin_add_preset_to_profiles', { p_preset_id: presetId, p_profile_ids: profileIds }));
+/**
+ * Removes a preset. The server refuses (preset_in_use) when it is still placed and no
+ * choice was made, so lessons are never deleted silently. Returns the lessons affected.
+ */
+export async function removePreset(id: string, lessons: LessonsOnRemoval = { kind: 'none' }): Promise<number> {
+  return unwrap<number>(
+    db().rpc('admin_remove_preset', {
+      p_preset_id: id,
+      p_lessons: lessons.kind === 'none' ? null : lessons.kind,
+      p_replacement_id: lessons.kind === 'replace' ? lessons.replacementId : null,
+    }),
+  );
 }

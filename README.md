@@ -64,19 +64,27 @@ It runs in one of two modes, chosen at build time:
   - **Sessions dashboard**: who is signed in, on which device, since when, last activity,
     expiry ("none — until disconnected"), with **Force Disconnect**, revoke code and disable
     account.
-  - **Subjects (presets)**: name, short name, teacher, room, colour (spec defaults seeded),
-    notes; archive instead of delete when in use; assign to many students at once.
+  - **Subjects per user**: every student has an **independent** subject list on their user
+    page (Users → user → מקצועות): add, edit, duplicate, hide or remove subjects with name,
+    teacher, room and colour; add several at once from the library or copy all/selected from
+    another student. Copies are independent, so changing one student's subjects never affects
+    anyone else. Removing a subject that is in use asks first: move its lessons to another
+    subject, empty those periods, or only hide it.
+  - **Subject library** (מאגר): the admin's subjects for templates and as a copy source; no
+    student ever sees it.
   - **Templates**: visual week editor (tap a cell, move/copy, mouse drag-and-drop with Alt/Ctrl
     to copy), bell-time editor (1–13 periods), duplicate, and assign to one or many students
-    with an explicit choice before overwriting customised timetables.
-  - **Per-student timetable** editor and subject access, plus notices and events/exams for
-    everyone or for one student.
+    with an explicit choice before overwriting customised timetables. Assigning copies the
+    template's library subjects into each student's own list (reusing earlier copies).
+  - **Per-student timetable** editor (with that student's own subjects only), plus notices
+    and events/exams for everyone or for one student.
 - **Students**: a single access-code field (with a warning never to type a WEBTOP password).
   The server allows **one live session per code**: a second device is refused, never the
   first. Sessions persist indefinitely with rotating refresh tokens; nothing expires on
   inactivity. The 7-tap edit mode lets a signed-in student arrange **their own** timetable from
-  the subjects an admin assigned (teacher/room/colour come from the subject); changes are saved
-  to their account and never grant admin access.
+  **their own** subject list (picking a subject fills in its teacher, room and colour; students
+  cannot change the subjects themselves); changes are saved to their account and never grant
+  admin access.
 
 ## Requirements
 
@@ -127,7 +135,7 @@ always opens in viewing mode.
 > mechanism and grants no access to the official WEBTOP system or to the admin panel. In account
 > mode it works only with a signed-in session the server has confirmed (and a connection), and
 > the server decides what may change: only the signed-in student's own timetable, using only
-> the subjects an admin assigned. In local mode there are no accounts and nothing leaves the
+> the subjects in their own list. In local mode there are no accounts and nothing leaves the
 > device.
 
 To edit a lesson, tap it (or an empty "+ הוספת שיעור" cell) while edit mode is on. In local mode
@@ -314,14 +322,20 @@ day must have exactly one cell per period: a lesson object or `null` for an empt
     inactivity; refresh-token rotation; force disconnect, revoked/replaced codes and disabled
     accounts end access and revoke refresh tokens; rate limiting per IP; hashes only; student
     isolation; blocked direct writes; storage policies; admin-only code issuance and RPCs;
-    templates vs customised timetables.
+    templates vs customised timetables; per-user subjects (two students with same-named
+    subjects stay independent, edits never cross over, students read only their own, copying
+    creates independent rows, removing a subject in use needs an explicit choice); and the
+    migration from shared presets keeps every existing timetable intact.
   - **E2E** (Playwright against the stack): admin sign-in and non-admin rejection; create a
     student, upload and crop a picture, weak custom code opt-in, show-once codes and
-    replacement; subject assignment and per-student timetable editing; template building and
-    the customised-timetable confirmation; presets CRUD/archive; sessions dashboard force
+    replacement; per-user subjects (add, copy from the library and from another user, edit,
+    duplicate, warn-before-remove with replacement, hide) and per-student timetable editing;
+    template building and the customised-timetable confirmation; library CRUD/archive; sessions
+    dashboard force
     disconnect; student sign-in, persistence across reloads and token expiry, second device
     rejected, simultaneous sign-ins (exactly one wins), sign-out on disconnect/revoke/disable,
-    restricted edit mode (opened by the gesture alone) saved to the server, and the gesture never
+    restricted edit mode (opened by the gesture alone, showing only the student's own subjects)
+    saved to the server and still there after logging out and back in, and the gesture never
     opening the admin panel.
 
 Not covered automatically: real iOS Safari/WebKit (CI uses Chromium), "Add to Home Screen"

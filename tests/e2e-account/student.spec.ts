@@ -1,6 +1,6 @@
 /** Students in account mode: access-code sign-in, the one-device rule, persistence, editing. */
 import { expect, test, type Browser, type Page } from '@playwright/test';
-import { adminClient, createStudent, dayTable, signInStudent, sql, stackAvailable, unlockEditMode } from './helpers';
+import { adminClient, createStudent, createUserPreset, dayTable, signInStudent, sql, stackAvailable, unlockEditMode } from './helpers';
 
 test.skip(!stackAvailable, 'needs the local stack (npm run stack)');
 
@@ -9,18 +9,11 @@ async function device(browser: Browser): Promise<Page> {
   return (await browser.newContext()).newPage();
 }
 
-/** Presets by name (seeded defaults). */
-async function presetId(name: string): Promise<string> {
-  const [row] = await sql<{ id: string }>('select id from public.subject_presets where name = $1', [name]);
-  if (!row) throw new Error(`preset ${name} not found`);
-  return row.id;
-}
-
 test('signs in with a code, shows only the student’s data and stays signed in across reloads', async ({ page }) => {
   const admin = await adminClient();
   const { code, profileId } = await createStudent({ display_name: 'מאיה כץ', class_name: "יא' 1" });
   const other = await createStudent({ display_name: 'מישהו אחר' });
-  const math = await presetId('מתמטיקה');
+  const math = await createUserPreset(profileId, { name: 'מתמטיקה' });
   await admin.rpc('admin_save_user_lessons', { p_profile_id: profileId, p_changes: [{ day: 'sun', period_index: 0, preset_id: math }] });
   await admin.from('notifications').insert([
     { profile_id: profileId, category: 'general', title: 'הודעה למאיה', body: '' },
@@ -140,32 +133,49 @@ test('force-disconnect, code revocation and disabling all sign the device out', 
   await expect(page.getByRole('alert')).toContainText('הושבת');
 });
 
-test('edit mode arranges only assigned subjects, saves to the account and never opens the admin panel', async ({ page }) => {
-  const admin = await adminClient();
+test('seven taps open the personal editor with only the student’s own subjects; edits persist after logging out and in', async ({ page }) => {
   const { code, profileId } = await createStudent({ display_name: 'עורכת' });
-  const [chemistry, history] = [await presetId('כימיה'), await presetId('היסטוריה')];
-  await admin.rpc('admin_set_profile_presets', { p_profile_id: profileId, p_preset_ids: [chemistry, history] });
+  const other = await createStudent({ display_name: 'תלמיד אחר' });
+  await createUserPreset(profileId, { name: 'כימיה', teacher: 'רחל', room: 'מעבדה 2', color: '#92be43' });
+  await createUserPreset(profileId, { name: 'היסטוריה', teacher: 'דוד', room: '107', color: '#444cc1' });
+  // Same name, different details, another student: must never appear here.
+  await createUserPreset(other.profileId, { name: 'כימיה', teacher: 'מורה של אחר', room: '999' });
+  await createUserPreset(other.profileId, { name: 'ספרות', teacher: 'מורה של אחר' });
 
   await signInStudent(page, code);
   await unlockEditMode(page);
   await page.getByRole('radio', { name: 'יום שלישי', exact: true }).click();
   await dayTable(page).getByRole('button').first().click();
   const editor = page.getByRole('dialog');
+  // An empty period plus the student's two subjects; no editable teacher/room fields.
   await expect(editor.getByRole('radio')).toHaveCount(3);
+  await expect(editor.getByRole('radio', { name: 'ספרות' })).toHaveCount(0);
   await expect(editor.getByLabel('מורה')).toHaveCount(0);
   await editor.getByRole('radio', { name: 'כימיה' }).click();
+  // Picking the subject fills in its teacher and room.
+  await expect(editor).toContainText('רחל');
+  await expect(editor).toContainText('מעבדה 2');
+  await expect(editor).not.toContainText('מורה של אחר');
   await editor.getByRole('button', { name: 'שמירה' }).click();
   await expect(dayTable(page)).toContainText('כימיה');
+  await expect(dayTable(page)).toContainText('רחל');
   await expect
     .poll(async () => (await sql('select preset_id from public.lessons where profile_id = $1 and day = $2', [profileId, 'tue'])).length)
     .toBe(1);
+  // Only the student's own timetable changed.
+  expect(await sql('select 1 from public.lessons where profile_id = $1', [other.profileId])).toEqual([]);
 
-  // Survives a reload because it lives on the server.
-  await page.reload();
+  // Log out and back in with the same code: the edit is still there (it lives on the server).
+  await page.goto('#/settings');
+  await page.getByRole('button', { name: 'התנתקות' }).click();
+  await page.getByRole('dialog', { name: 'התנתקות' }).getByRole('button', { name: 'התנתקות' }).click();
+  await expect(page.getByText(/^התנתקת\./)).toBeVisible();
+  await signInStudent(page, code);
   await page.getByRole('radio', { name: 'יום שלישי', exact: true }).click();
   await expect(dayTable(page)).toContainText('כימיה');
+  await expect(dayTable(page)).toContainText('מעבדה 2');
 
-  // The edit code is not an admin credential.
+  // The edit gesture is not an admin credential.
   await page.goto('#/admin');
   await expect(page.getByRole('heading', { name: 'כניסת מנהל' })).toBeVisible();
 });

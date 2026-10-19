@@ -1,13 +1,13 @@
-/** The admin panel against the real backend: users, codes, pictures, presets, templates, sessions. */
+/** The admin panel against the real backend: users, codes, pictures, subjects, templates, sessions. */
 import { expect, test, type Page } from '@playwright/test';
 import { loginStudent } from '../backend/helpers';
-import { createStudent, env, signInAdmin, solidPng, sql, stackAvailable, uniqueDigits } from './helpers';
+import { createStudent, createUserPreset, env, signInAdmin, solidPng, sql, stackAvailable, uniqueDigits } from './helpers';
 
 test.skip(!stackAvailable, 'needs the local stack (npm run stack)');
 
 /** Opens a student's page from the users list by name. */
 async function openUser(page: Page, name: string): Promise<void> {
-  await page.getByRole('button', { name: 'משתמשים' }).click();
+  await page.getByRole('navigation', { name: 'אזורי ניהול' }).getByRole('button', { name: 'משתמשים', exact: true }).click();
   await page.getByRole('searchbox', { name: 'חיפוש משתמשים' }).fill(name);
   await page.getByRole('button', { name: new RegExp(name) }).first().click();
   await expect(page.getByRole('heading', { name, level: 1 })).toBeVisible();
@@ -83,29 +83,151 @@ test('creates a student, sets a picture and issues codes that are shown once', a
   expect((await loginStudent(digits)).status).toBe(401);
 });
 
-test('assigns subjects and edits a student’s own timetable', async ({ page }) => {
+/** A user's subject cards (Users → user → מקצועות). */
+function subjectCard(page: Page, name: string) {
+  return page.getByRole('listitem').filter({ has: page.getByRole('heading', { name, exact: true, level: 3 }) });
+}
+
+/** Presets owned by a student, as stored. */
+async function ownedPresets(profileId: string) {
+  return sql<{ id: string; name: string; teacher: string; room: string; color: string }>(
+    'select id, name, teacher, room, color from public.subject_presets where profile_id = $1 order by name, teacher',
+    [profileId],
+  );
+}
+
+test('each user has an independent subject list: add, copy from the library and from another user, edit, duplicate', async ({ page }) => {
+  const tag = uniqueDigits(5);
+  const a = await createStudent({ display_name: `משתמש א ${tag}` });
+  const b = await createStudent({ display_name: `משתמש ב ${tag}` });
+  await signInAdmin(page);
+
+  // User A: a new subject with name, teacher, room and colour.
+  await openUser(page, `משתמש א ${tag}`);
+  await page.getByRole('tab', { name: 'מקצועות' }).click();
+  await expect(page.getByText(/עדיין אין מקצועות/)).toBeVisible();
+  await page.getByRole('button', { name: 'מקצוע חדש' }).click();
+  const editor = page.getByRole('dialog', { name: /מקצוע חדש ל/ });
+  await editor.getByLabel(/שם המקצוע/).fill('מתמטיקה');
+  await editor.getByLabel('מורה').fill('דניאל');
+  await editor.getByLabel('חדר').fill('101');
+  await editor.getByRole('radio', { name: '#1498fd' }).click();
+  await editor.getByRole('button', { name: 'שמירה' }).click();
+  await expect(subjectCard(page, 'מתמטיקה')).toContainText('דניאל · חדר 101');
+
+  // Several subjects at once from the library.
+  await page.getByRole('button', { name: 'הוספה מהמאגר' }).click();
+  const fromLibrary = page.getByRole('dialog', { name: /הוספת מקצועות ל/ });
+  await expect(fromLibrary.getByRole('checkbox', { name: /^מתמטיקה/ })).not.toBeChecked();
+  await expect(fromLibrary.getByText(/כבר קיים אצל/)).toBeVisible();
+  await fromLibrary.getByRole('button', { name: 'ניקוי' }).click();
+  await fromLibrary.getByRole('checkbox', { name: /^אנגלית/ }).check();
+  await fromLibrary.getByRole('checkbox', { name: /^היסטוריה/ }).check();
+  await fromLibrary.getByRole('button', { name: 'העתקה (2)' }).click();
+  await expect(subjectCard(page, 'אנגלית')).toBeVisible();
+  await expect(subjectCard(page, 'היסטוריה')).toBeVisible();
+  expect((await ownedPresets(a.profileId)).map((p) => p.name)).toEqual(['אנגלית', 'היסטוריה', 'מתמטיקה']);
+
+  // User B copies only "מתמטיקה" from A, then gives it another teacher and room.
+  await openUser(page, `משתמש ב ${tag}`);
+  await page.getByRole('tab', { name: 'מקצועות' }).click();
+  await page.getByRole('button', { name: 'העתקה ממשתמש אחר' }).click();
+  const fromUser = page.getByRole('dialog', { name: /הוספת מקצועות ל/ });
+  await fromUser.getByLabel('העתקה מ־').selectOption({ label: `משתמש א ${tag} (י' 1)` });
+  await expect(fromUser.getByRole('checkbox')).toHaveCount(3);
+  await fromUser.getByRole('button', { name: 'ניקוי' }).click();
+  await fromUser.getByRole('checkbox', { name: /^מתמטיקה/ }).check();
+  await fromUser.getByRole('button', { name: 'העתקה (1)' }).click();
+  await expect(subjectCard(page, 'מתמטיקה')).toContainText('דניאל · חדר 101');
+  await expect(subjectCard(page, 'אנגלית')).toHaveCount(0);
+
+  await subjectCard(page, 'מתמטיקה').getByRole('button', { name: 'עריכה' }).click();
+  const edit = page.getByRole('dialog', { name: 'עריכת „מתמטיקה”' });
+  await edit.getByLabel('מורה').fill('מיכאל');
+  await edit.getByLabel('חדר').fill('302');
+  await edit.getByRole('button', { name: 'שמירה' }).click();
+  await expect(subjectCard(page, 'מתמטיקה')).toContainText('מיכאל · חדר 302');
+
+  // Duplicate: same details, a new independent subject.
+  await subjectCard(page, 'מתמטיקה').getByRole('button', { name: 'שכפול' }).click();
+  const duplicate = page.getByRole('dialog', { name: 'שכפול „מתמטיקה”' });
+  await expect(duplicate.getByLabel(/שם המקצוע/)).toHaveValue('מתמטיקה (עותק)');
+  await duplicate.getByRole('button', { name: 'שמירה' }).click();
+  await expect(subjectCard(page, 'מתמטיקה (עותק)')).toContainText('מיכאל · חדר 302');
+
+  // A is unchanged by everything done to B.
+  const ofA = await ownedPresets(a.profileId);
+  const ofB = await ownedPresets(b.profileId);
+  expect(ofA.find((p) => p.name === 'מתמטיקה')).toMatchObject({ teacher: 'דניאל', room: '101' });
+  expect(ofB.map((p) => [p.name, p.teacher, p.room])).toEqual([
+    ['מתמטיקה', 'מיכאל', '302'],
+    ['מתמטיקה (עותק)', 'מיכאל', '302'],
+  ]);
+  expect(ofA.some((p) => ofB.some((q) => q.id === p.id))).toBe(false);
+});
+
+test('edits a student’s timetable with their own subjects and warns before removing a subject in use', async ({ page }) => {
   const name = `מערכת ${uniqueDigits(5)}`;
   const { profileId } = await createStudent({ display_name: name });
+  const other = await createStudent({ display_name: `אחר ${uniqueDigits(5)}` });
+  await createUserPreset(profileId, { name: 'פיזיקה', teacher: 'רונית', room: '12' });
+  const chemistry = await createUserPreset(profileId, { name: 'כימיה', teacher: 'רחל', room: 'מעבדה 2', color: '#92be43' });
+  await createUserPreset(other.profileId, { name: 'של משתמש אחר' });
   await signInAdmin(page);
   await openUser(page, name);
 
-  await page.getByRole('tab', { name: 'מקצועות' }).click();
-  await page.getByRole('checkbox', { name: /כימיה/ }).check();
-  await page.getByRole('button', { name: 'שמירה', exact: true }).click();
-  await expect(page.getByText(/רשימת המקצועות נשמרה/)).toBeVisible();
-  const [link] = await sql('select 1 as ok from public.profile_presets pp join public.subject_presets sp on sp.id = pp.preset_id where pp.profile_id = $1 and sp.name = $2', [profileId, 'כימיה']);
-  expect(link?.ok).toBe(1);
-
+  // Only this student's subjects are offered in their timetable.
   await page.getByRole('tab', { name: 'מערכת שעות' }).click();
   await page.getByRole('button', { name: 'רביעי, שעה 2: ריקה. הוספת שיעור' }).click();
   const sheet = page.getByRole('dialog', { name: /רביעי · שעה 2/ });
-  await sheet.getByRole('radio', { name: 'היסטוריה' }).click();
+  await expect(sheet.getByRole('radio')).toHaveCount(3);
+  await expect(sheet.getByRole('radio', { name: 'של משתמש אחר' })).toHaveCount(0);
+  await expect(sheet.getByRole('radio', { name: 'מתמטיקה' })).toHaveCount(0);
+  await sheet.getByRole('radio', { name: 'פיזיקה' }).click();
   await sheet.getByRole('button', { name: 'החלה' }).click();
   await expect(page.getByText('יש שינויים שלא נשמרו')).toBeVisible();
   await page.getByRole('button', { name: 'שמירת שינויים' }).click();
   await expect(page.getByText('מערכת השעות של התלמיד/ה נשמרה')).toBeVisible();
-  const lessons = await sql<{ day: string; period_index: number }>('select day, period_index from public.lessons where profile_id = $1', [profileId]);
-  expect(lessons).toEqual([{ day: 'wed', period_index: 1 }]);
+  const lessons = await sql<{ day: string; period_index: number; name: string; owner: string }>(
+    'select l.day, l.period_index, sp.name, sp.profile_id as owner from public.lessons l join public.subject_presets sp on sp.id = l.preset_id where l.profile_id = $1',
+    [profileId],
+  );
+  expect(lessons).toEqual([{ day: 'wed', period_index: 1, name: 'פיזיקה', owner: profileId }]);
+
+  // Editing a subject in use says where the change will appear.
+  await page.getByRole('tab', { name: 'מקצועות' }).click();
+  const physics = subjectCard(page, 'פיזיקה');
+  await expect(physics).toContainText('משובץ בשיעור אחד');
+  await physics.getByRole('button', { name: 'עריכה' }).click();
+  await expect(page.getByRole('dialog')).toContainText(`משובץ בשיעור אחד במערכת של ${name}`);
+  await page.getByRole('dialog').getByRole('button', { name: 'ביטול' }).click();
+
+  // Removing it requires a choice for its lesson; replacing keeps the period filled.
+  await physics.getByRole('button', { name: 'הסרה' }).click();
+  const removal = page.getByRole('dialog', { name: 'הסרת „פיזיקה”' });
+  await expect(removal.getByRole('alert')).toContainText('משובץ בשיעור אחד');
+  await expect(removal.getByRole('button', { name: 'הסרה' })).toBeDisabled();
+  await removal.getByRole('radio', { name: /להחליף אותם במקצוע אחר/ }).check();
+  await expect(removal.getByRole('button', { name: 'הסרה' })).toBeDisabled();
+  await removal.getByLabel('מקצוע חלופי').selectOption({ label: 'כימיה' });
+  await removal.getByRole('button', { name: 'הסרה' }).click();
+  await expect(page.getByText('„פיזיקה” הוסר והשיעורים שלו הוחלפו')).toBeVisible();
+  await expect(physics).toHaveCount(0);
+  expect(await sql('select day, period_index, preset_id from public.lessons where profile_id = $1', [profileId])).toEqual([
+    { day: 'wed', period_index: 1, preset_id: chemistry },
+  ]);
+
+  // Hiding keeps the lesson and only removes the subject from the student's choices.
+  await subjectCard(page, 'כימיה').getByRole('button', { name: 'הסרה' }).click();
+  const hide = page.getByRole('dialog', { name: 'הסרת „כימיה”' });
+  await hide.getByRole('radio', { name: /רק להסתיר מהבחירה/ }).check();
+  await hide.getByRole('button', { name: 'הסתרה' }).click();
+  await expect(subjectCard(page, 'כימיה')).toHaveCount(0);
+  await page.getByRole('radio', { name: /מוסתרים/ }).click();
+  await expect(subjectCard(page, 'כימיה')).toContainText('מוסתר מהבחירה');
+  expect(await sql('select 1 from public.lessons where profile_id = $1', [profileId])).toHaveLength(1);
+  // The other student was never touched.
+  expect(await ownedPresets(other.profileId)).toHaveLength(1);
 });
 
 test('builds a template and confirms before overwriting customised timetables', async ({ page }) => {
@@ -141,14 +263,18 @@ test('builds a template and confirms before overwriting customised timetables', 
   const count = async (id: string) => (await sql<{ n: number }>('select count(*)::int as n from public.lessons where profile_id = $1', [id]))[0]?.n;
   expect(await count(fresh.profileId)).toBe(2);
   expect(await count(custom.profileId)).toBe(0);
+  // The template's subject became the student's own copy.
+  expect(await ownedPresets(fresh.profileId)).toEqual([expect.objectContaining({ name: 'מתמטיקה' })]);
+  expect(await ownedPresets(custom.profileId)).toEqual([]);
 });
 
-test('presets can be created, edited and archived', async ({ page }) => {
+test('library presets can be created, edited and archived', async ({ page }) => {
   const name = `רובוטיקה ${uniqueDigits(4)}`;
   await signInAdmin(page);
-  await page.getByRole('button', { name: 'מקצועות' }).click();
+  await page.getByRole('button', { name: 'מאגר' }).click();
+  await expect(page.getByRole('heading', { name: 'מאגר מקצועות', level: 1 })).toBeVisible();
   await page.getByRole('button', { name: 'מקצוע חדש' }).click();
-  const editor = page.getByRole('dialog', { name: 'מקצוע חדש' });
+  const editor = page.getByRole('dialog', { name: 'מקצוע חדש במאגר' });
   await editor.getByLabel(/שם המקצוע/).fill(name);
   await editor.getByLabel('מורה').fill('מורה לרובוטיקה');
   await editor.getByLabel('חדר').fill('111');
@@ -166,6 +292,8 @@ test('presets can be created, edited and archived', async ({ page }) => {
   await expect(page.getByRole('heading', { name })).toHaveCount(0);
   await page.getByRole('radio', { name: /בארכיון/ }).click();
   await expect(page.getByRole('heading', { name })).toBeVisible();
+  // Library presets belong to no student.
+  expect(await sql('select profile_id from public.subject_presets where name = $1', [name])).toEqual([{ profile_id: null }]);
 });
 
 test('sessions dashboard shows the live session and force-disconnects it', async ({ page }) => {

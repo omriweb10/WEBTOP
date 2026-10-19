@@ -11,7 +11,8 @@ import { getUserTimetable, saveUserLessons, setUserPeriods } from '../../api/tim
 import type { UserOverview } from '../../api/types';
 import { errorMessage } from '../../domain/adminErrors';
 import { lessonsLostByResize, presetMap, presetRowToLocal, timetableFromRows, withPeriods } from '../../domain/scheduleModel';
-import { usePresets, useTemplates, useUsers } from '../../state/resources';
+import { useTemplates, useUsers } from '../../state/resources';
+import { useUserPresets } from '../../state/userPresets';
 import { PeriodsEditor } from '../schedule/PeriodsEditor';
 import { WeekGrid } from '../schedule/WeekGrid';
 import { Badge } from '../shared/Badge';
@@ -28,7 +29,7 @@ interface Loaded {
 
 /** The admin's view and editor of one student's own timetable. */
 export function UserTimetablePanel({ user }: { user: UserOverview }) {
-  const presets = usePresets();
+  const presets = useUserPresets(user.id);
   const templates = useTemplates();
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [draft, setDraft] = useState<Timetable | null>(null);
@@ -37,12 +38,10 @@ export function UserTimetablePanel({ user }: { user: UserOverview }) {
   const [busy, setBusy] = useState(false);
   const [templateId, setTemplateId] = useState('');
 
-  const loadPresets = presets.load;
   const loadTemplates = templates.load;
   useEffect(() => {
-    void loadPresets();
     void loadTemplates();
-  }, [loadPresets, loadTemplates]);
+  }, [loadTemplates]);
 
   const presetRows = presets.data;
   useEffect(() => {
@@ -65,7 +64,7 @@ export function UserTimetablePanel({ user }: { user: UserOverview }) {
   const placeable = useMemo(() => (presetRows ?? []).filter((p) => !p.archived_at).map(presetRowToLocal), [presetRows]);
 
   if (failure) return <ErrorView message={failure} onRetry={() => setVersion((v) => v + 1)} />;
-  if (presets.status === 'error' && presets.error) return <ErrorView message={presets.error} onRetry={() => void presets.load(true)} />;
+  if (presets.status === 'error' && presets.error && !presetRows) return <ErrorView message={presets.error} onRetry={() => void presets.reload()} />;
   if (!loaded || !draft) return <LoadingView />;
 
   const periodsChanged = JSON.stringify(draft.periods) !== JSON.stringify(loaded.baseline.periods);
@@ -95,6 +94,7 @@ export function UserTimetablePanel({ user }: { user: UserOverview }) {
       if (changes.length > 0) await saveUserLessons(user.id, changes);
       toast('מערכת השעות של התלמיד/ה נשמרה', { tone: 'success' });
       setVersion((v) => v + 1);
+      void presets.reload();
       void useUsers.getState().load(true);
     } catch (error) {
       toast(errorMessage(error), { tone: 'error', duration: 6000 });
@@ -109,9 +109,11 @@ export function UserTimetablePanel({ user }: { user: UserOverview }) {
     if (!template) return;
     const ok = await confirm({
       title: 'החלת תבנית',
-      message: loaded.customized
-        ? `מערכת השעות של ${user.display_name} עברה התאמה אישית. החלת „${template.name}” תחליף את כל השינויים שלו/ה. להמשיך?`
-        : `להחליף את מערכת השעות של ${user.display_name} בתבנית „${template.name}”?`,
+      message:
+        (loaded.customized
+          ? `מערכת השעות של ${user.display_name} עברה התאמה אישית. החלת „${template.name}” תחליף את כל השינויים שלו/ה. להמשיך?`
+          : `להחליף את מערכת השעות של ${user.display_name} בתבנית „${template.name}”?`) +
+        ` מקצועות התבנית שעדיין אינם ברשימה של ${user.display_name} יתווספו אליה כעותקים עצמאיים.`,
       confirmLabel: 'החלה',
       tone: loaded.customized ? 'danger' : 'default',
     });
@@ -120,6 +122,7 @@ export function UserTimetablePanel({ user }: { user: UserOverview }) {
       await assignTemplate(template.id, [user.id], true);
       toast('התבנית הוחלה', { tone: 'success' });
       setVersion((v) => v + 1);
+      void presets.reload();
       void useUsers.getState().load(true);
     } catch (error) {
       toast(errorMessage(error), { tone: 'error' });
@@ -142,10 +145,13 @@ export function UserTimetablePanel({ user }: { user: UserOverview }) {
           </Button>
           {dirty && <span className={styles.dirty}>יש שינויים שלא נשמרו</span>}
         </div>
+        {placeable.length === 0 && (
+          <p className={userStyles.note}>ל{user.display_name} עדיין אין מקצועות פעילים. הוסיפו אותם בלשונית „מקצועות” כדי לשבץ שיעורים.</p>
+        )}
         <WeekGrid timetable={draft} presets={placeable} onChange={setDraft} />
         <p className={styles.legend}>
-          הקישו על משבצת כדי לבחור מקצוע, לרוקן אותה או להעביר/להעתיק. בעכבר אפשר גם לגרור (Alt/Ctrl בזמן השחרור = העתקה). מקצוע שמשובץ כאן
-          נוסף אוטומטית לרשימת המקצועות הזמינים של התלמיד/ה.
+          הקישו על משבצת כדי לבחור מקצוע, לרוקן אותה או להעביר/להעתיק. בעכבר אפשר גם לגרור (Alt/Ctrl בזמן השחרור = העתקה). אפשר לשבץ רק מקצועות
+          מהרשימה האישית של {user.display_name} (לשונית „מקצועות”).
         </p>
       </Panel>
       <Panel title="שעות הלימוד" id="user-periods">

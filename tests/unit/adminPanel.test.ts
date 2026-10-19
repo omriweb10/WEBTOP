@@ -49,6 +49,10 @@ function user(fields: Partial<UserOverview>): UserOverview {
 
 const PRESET: PresetRow = {
   id: ID,
+  profile_id: null,
+  library_preset_id: null,
+  lesson_count: 0,
+  template_lesson_count: 0,
   name: 'כימיה',
   short_name: '',
   teacher: 'מורה',
@@ -98,7 +102,7 @@ describe('admin forms', () => {
   });
 
   it('translates backend errors', () => {
-    expect(toAdminError({ code: '23503', message: 'update or delete violates foreign key' }).message).toMatch(/ארכיון/);
+    expect(toAdminError({ code: '23503', message: 'update or delete violates foreign key' }).message).toMatch(/בשימוש/);
     expect(toAdminError({ message: 'code_taken' }).message).toMatch(/בשימוש/);
     expect(toAdminError({ message: 'TypeError: Failed to fetch' }).code).toBe('network');
   });

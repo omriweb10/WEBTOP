@@ -27,9 +27,9 @@ export async function signInStudent(page: Page, code: string): Promise<void> {
   await expect(page.getByRole('heading', { name: 'מ. שעות ושינויים' })).toBeVisible({ timeout: 15_000 });
 }
 
-/** Opens the hidden edit mode with seven taps (no code, no dialog). */
-export async function unlockEditMode(page: Page): Promise<void> {
-  const title = page.getByRole('heading', { name: 'מ. שעות ושינויים' });
+/** Opens the hidden edit mode with seven taps on a screen's title (no code, no dialog). */
+export async function unlockEditMode(page: Page, titleText = 'מ. שעות ושינויים'): Promise<void> {
+  const title = page.getByRole('heading', { name: titleText, level: 1 });
   for (let i = 0; i < 7; i += 1) await title.click({ delay: 10 });
   await expect(page.getByRole('region', { name: 'מצב עריכה' })).toBeVisible();
   await expect(page.getByRole('dialog')).toHaveCount(0);

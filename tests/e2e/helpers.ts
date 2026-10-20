@@ -31,8 +31,8 @@ export async function openApp(page: Page, hash = '#/schedule/timetable', seed?: 
 }
 
 /** Performs the hidden gesture (7 rapid taps on the title), which opens edit mode at once. */
-export async function unlockEditMode(page: Page): Promise<void> {
-  const title = page.getByRole('heading', { name: 'מ. שעות ושינויים' });
+export async function unlockEditMode(page: Page, titleText = 'מ. שעות ושינויים'): Promise<void> {
+  const title = page.getByRole('heading', { name: titleText, level: 1 });
   for (let i = 0; i < 7; i += 1) await title.click({ delay: 10 });
   await expect(page.getByRole('region', { name: 'מצב עריכה' })).toBeVisible();
 }
@@ -45,4 +45,17 @@ export function dayTable(page: Page) {
 /** Name of the day shown in the table header (e.g. "שני"). */
 export function tableDayHeader(page: Page) {
   return dayTable(page).locator('thead th').nth(1);
+}
+
+/** Simulates a real one-finger touch drag through the Chrome DevTools Protocol. */
+export async function touchDrag(page: Page, from: { x: number; y: number }, to: { x: number; y: number }, steps = 8) {
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [from] });
+  for (let i = 1; i <= steps; i += 1) {
+    const x = from.x + ((to.x - from.x) * i) / steps;
+    const y = from.y + ((to.y - from.y) * i) / steps;
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y }] });
+  }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await cdp.detach();
 }

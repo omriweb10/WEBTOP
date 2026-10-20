@@ -13,7 +13,8 @@
   --icon-pressed: rgb(255 255 255 / 0.1);
 }
 
-.menuButton {
+/* The menu button or, inside a section, the back arrow. */
+.leadingButton {
   width: 40px;
   flex: none;
 }

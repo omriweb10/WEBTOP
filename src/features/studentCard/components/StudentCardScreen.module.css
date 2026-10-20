@@ -1,0 +1,5 @@
+.gap {
+  flex: none;
+  height: var(--panel-gap);
+  background: var(--color-page);
+}

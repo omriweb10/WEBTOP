@@ -10,7 +10,6 @@ export type ScheduleTab = (typeof SCHEDULE_TABS)[number];
 
 export const PLACEHOLDER_IDS = [
   'messages',
-  'student-card',
   'signatures',
   'weekly-planning',
   'phone-book',
@@ -25,12 +24,17 @@ export type PlaceholderId = (typeof PLACEHOLDER_IDS)[number];
 export const ADMIN_SECTIONS = ['users', 'sessions', 'presets', 'templates', 'content'] as const;
 export type AdminSection = (typeof ADMIN_SECTIONS)[number];
 
+/** Screens inside the Student Card section (the section itself has no section id). */
+export const STUDENT_CARD_SECTIONS = ['timetable'] as const;
+export type StudentCardSection = (typeof STUDENT_CARD_SECTIONS)[number];
+
 export type Route =
   | { name: 'home' }
   | { name: 'schedule'; tab: ScheduleTab }
   | { name: 'settings' }
   | { name: 'tools' }
   | { name: 'admin'; section: AdminSection; id?: string }
+  | { name: 'studentCard'; section?: StudentCardSection }
   | { name: 'placeholder'; id: PlaceholderId };
 
 export const DEFAULT_ROUTE: Route = { name: 'schedule', tab: 'timetable' };
@@ -55,7 +59,13 @@ export function parseHash(hash: string): Route {
       const id = third && /^[0-9a-f-]{36}$/.test(third) ? third : undefined;
       return id ? { name: 'admin', section, id } : { name: 'admin', section };
     }
+    case 'student-card':
+      return STUDENT_CARD_SECTIONS.includes(second as StudentCardSection)
+        ? { name: 'studentCard', section: second as StudentCardSection }
+        : { name: 'studentCard' };
     case 'page':
+      // The Student Card used to be a placeholder page; keep its old link working.
+      if (second === 'student-card') return { name: 'studentCard' };
       return PLACEHOLDER_IDS.includes(second as PlaceholderId)
         ? { name: 'placeholder', id: second as PlaceholderId }
         : DEFAULT_ROUTE;
@@ -77,6 +87,8 @@ export function routeToHash(route: Route): string {
       return '#/tools';
     case 'admin':
       return `#/admin/${route.section}${route.id ? `/${route.id}` : ''}`;
+    case 'studentCard':
+      return `#/student-card${route.section ? `/${route.section}` : ''}`;
     case 'placeholder':
       return `#/page/${route.id}`;
   }
@@ -85,6 +97,24 @@ export function routeToHash(route: Route): string {
 /** True when two routes render the same screen and tab. */
 export function sameRoute(a: Route, b: Route): boolean {
   return routeToHash(a) === routeToHash(b);
+}
+
+/** Hash of the screen shown before the current one (null when unknown, e.g. after a reload). */
+let previousHash: string | null = null;
+if (typeof window !== 'undefined') {
+  window.addEventListener('hashchange', (event) => {
+    previousHash = event.oldURL ? new URL(event.oldURL).hash : null;
+  });
+}
+
+/**
+ * In-app back arrow: returns to `parent`. When the user came from there, this steps back
+ * through the browser history (so history stays as if they never left); otherwise (deep
+ * link, reload) it replaces the current entry with the parent screen.
+ */
+export function goBack(parent: Route): void {
+  if (previousHash === routeToHash(parent)) window.history.back();
+  else navigate(parent, { replace: true });
 }
 
 /** Subscribes to hash changes for useSyncExternalStore. */

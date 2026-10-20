@@ -19,3 +19,8 @@
   /* Measured: 72pt of space below the last row, clearing the FAB. */
   padding: 0 var(--page-gutter) 72px;
 }
+
+/* Measured on the Student Card timetable: the table starts 10pt below the day bar. */
+.spaced {
+  padding-top: 10px;
+}

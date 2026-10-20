@@ -1,18 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
-import { dayTable, openApp, tableDayHeader, trackErrors } from './helpers';
-
-/** Simulates a real one-finger touch drag through the Chrome DevTools Protocol. */
-async function touchDrag(page: Page, from: { x: number; y: number }, to: { x: number; y: number }, steps = 8) {
-  const cdp = await page.context().newCDPSession(page);
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [from] });
-  for (let i = 1; i <= steps; i += 1) {
-    const x = from.x + ((to.x - from.x) * i) / steps;
-    const y = from.y + ((to.y - from.y) * i) / steps;
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y }] });
-  }
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-  await cdp.detach();
-}
+import { expect, test } from '@playwright/test';
+import { dayTable, openApp, tableDayHeader, touchDrag, trackErrors } from './helpers';
 
 test.describe('timetable view', () => {
   test('loads under /WEBTOP/ on today with all 13 periods and a clean console', async ({ page }) => {

@@ -33,6 +33,11 @@ It runs in one of two modes, chosen at build time:
 - **ריכוז מידע** home screen: Hebrew date, greeting, editable shortcuts, today's lessons.
 - **Sidebar** mirroring the reference menu. Entries with no local equivalent open clearly
   labelled placeholders.
+- **כרטיס תלמיד → מערכת שעות** (side menu → Student Card → timetable): a second timetable
+  screen measured from the original — back arrow, title, export and change-alert icons, a
+  "שם התלמיד/ה" card with the signed-in student's name (from their Supabase profile in account
+  mode), the day buttons and the day table. It shares the timetable, the 7-tap edit mode and
+  the editing logic with the main screen, so an edit made in either view appears in both.
 - **Hidden local edit mode**. In it you can:
   - add, edit, duplicate, move, copy and delete lessons, or set a period empty;
   - fill subject, teacher, room and colour from a subject preset in one tap, with per-lesson
@@ -237,6 +242,7 @@ src/
 │   │                    lists), components/ (users, sessions, presets, templates, schedule
 │   │                    grid, content, shared)
 │   ├── notices/ events/ Tabs, editors, pure sort/filter/group rules, actions
+│   ├── studentCard/     כרטיס תלמיד: section and timetable screens, name card, entries
 │   ├── home/ settings/ placeholders/
 ├── schemas/             zod schemas: the single source of truth for persisted & imported data
 ├── config/              Backend configuration (build-time Supabase URL/key → account mode)

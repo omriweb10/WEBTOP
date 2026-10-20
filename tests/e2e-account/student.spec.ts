@@ -199,3 +199,49 @@ test('the seven-tap gesture needs a connection to the server, and opens edit mod
   await expect(page.getByText(/אין חיבור לשרת · מוצגים הנתונים/)).toHaveCount(0);
   await unlockEditMode(page);
 });
+
+test('כרטיס תלמיד → מערכת שעות shows the student’s own name and timetable, and its edits reach the main view', async ({ page }) => {
+  const admin = await adminClient();
+  const { code, profileId } = await createStudent({ display_name: 'שירה כהן' });
+  const other = await createStudent({ display_name: 'תלמיד אחר' });
+  const math = await createUserPreset(profileId, { name: 'מתמטיקה', teacher: 'דניאל', room: '101', color: '#1498fd' });
+  const chemistry = await createUserPreset(profileId, { name: 'כימיה', teacher: 'רחל', room: 'מעבדה 2', color: '#92be43' });
+  const foreign = await createUserPreset(other.profileId, { name: 'ספרות', teacher: 'מורה של אחר', room: '999' });
+  await admin.rpc('admin_save_user_lessons', { p_profile_id: profileId, p_changes: [{ day: 'tue', period_index: 1, preset_id: math }] });
+  await admin.rpc('admin_save_user_lessons', { p_profile_id: other.profileId, p_changes: [{ day: 'tue', period_index: 0, preset_id: foreign }] });
+
+  await signInStudent(page, code);
+  await page.getByRole('button', { name: 'פתיחת תפריט' }).click();
+  await page.getByRole('dialog', { name: 'תפריט ראשי' }).getByRole('button', { name: 'כרטיס תלמיד' }).click();
+  await page.getByRole('navigation', { name: 'כרטיס תלמיד' }).getByRole('button', { name: 'מערכת שעות' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'מערכת שעות' })).toBeVisible();
+
+  // Name and lessons from the student's own Supabase data; nothing of the other student.
+  await expect(page.getByTestId('student-name')).toHaveText('שירה כהן');
+  await page.getByRole('radio', { name: 'יום שלישי', exact: true }).click();
+  const rows = dayTable(page).locator('tbody tr');
+  await expect(rows.nth(0).locator('td')).toHaveText('שעה פנויה');
+  await expect(rows.nth(1)).toContainText('מתמטיקה');
+  await expect(rows.nth(1)).toContainText('דניאל');
+  await expect(rows.nth(1)).toContainText('חדר: 101');
+  expect(await rows.nth(1).locator('td > div').first().evaluate((el) => getComputedStyle(el).borderInlineStartColor)).toBe('rgb(20, 152, 253)');
+  await expect(page.locator('body')).not.toContainText('ספרות');
+  await expect(page.locator('body')).not.toContainText('מורה של אחר');
+
+  // Seven taps on this title, then edit: saved to the account and shown on the main timetable.
+  await unlockEditMode(page, 'מערכת שעות');
+  await rows.nth(0).getByRole('button', { name: /הוספת שיעור/ }).click();
+  const editor = page.getByRole('dialog');
+  await expect(editor.getByRole('radio', { name: 'ספרות' })).toHaveCount(0);
+  await editor.getByRole('radio', { name: 'כימיה' }).click();
+  await editor.getByRole('button', { name: 'שמירה' }).click();
+  await expect(rows.nth(0)).toContainText('כימיה');
+  await expect
+    .poll(async () => (await sql<{ preset_id: string }>('select preset_id from public.lessons where profile_id = $1 and day = $2 and period_index = 0', [profileId, 'tue']))[0]?.preset_id)
+    .toBe(chemistry);
+
+  await page.goto('#/schedule/timetable');
+  await page.getByRole('radio', { name: 'יום שלישי', exact: true }).click();
+  await expect(dayTable(page).locator('tbody tr').nth(0)).toContainText('כימיה');
+  await expect(dayTable(page).locator('tbody tr').nth(1)).toContainText('מתמטיקה');
+});

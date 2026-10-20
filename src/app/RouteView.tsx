@@ -3,6 +3,8 @@ import { useCanEditLocalContent } from '../features/admin/editCapabilities';
 import { HomeScreen } from '../features/home/components/HomeScreen';
 import { PlaceholderScreen } from '../features/placeholders/components/PlaceholderScreen';
 import { SettingsScreen } from '../features/settings/components/SettingsScreen';
+import { StudentCardScreen } from '../features/studentCard/components/StudentCardScreen';
+import { StudentCardTimetableScreen } from '../features/studentCard/components/StudentCardTimetableScreen';
 import { useRoute } from './router';
 import { ScheduleHubScreen } from './screens/ScheduleHubScreen';
 
@@ -23,6 +25,8 @@ export function RouteView() {
       return <SettingsScreen />;
     case 'tools':
       return canUseTools ? <LocalToolsScreen /> : <SettingsScreen />;
+    case 'studentCard':
+      return route.section === 'timetable' ? <StudentCardTimetableScreen /> : <StudentCardScreen />;
     case 'placeholder':
       return <PlaceholderScreen id={route.id} />;
   }

@@ -26,6 +26,7 @@ the colour the reference shows behind the system UI.
 | → **אירועים ומבחנים** tab | Yes (loading spinner only) | `EventsTab`: group filter plus a list or month view of local items; empty state instead of a spinner |
 | Sidebar drawer | Yes | `Sidebar`: same items, order, icons and active styling; adds "הגדרות ואודות" |
 | ריכוז מידע (home) | Yes | `HomeScreen`: date bar with Hebrew date, greeting, notices summary, editable shortcuts, changes, today's lessons |
+| כרטיס תלמיד → מערכת שעות | Light screenshot | `StudentCardTimetableScreen`: matches the screenshot to within 1pt (see below) |
 | Other drawer items | Listed only | Clearly labelled placeholder screens; no fake content |
 | Edit mode, editors, admin | No (new) | Hidden behind 7 taps on the title plus the demo code |
 
@@ -51,6 +52,16 @@ the colour the reference shows behind the system UI.
 
 Residual difference against matching frames, cropped to the app area: mean absolute error is
 about 4–6 of 255 per channel, almost entirely text anti-aliasing (iOS CoreText vs Chromium).
+
+### כרטיס תלמיד → מערכת שעות (light screenshot, 402×874 pt)
+
+Same app bar, day bar and table as the main timetable, with three differences:
+
+| Region | Measurement | Notes |
+|---|---|---|
+| App bar | 55 | Back arrow where the menu button is (centred 36pt from the right edge), title "מערכת שעות" from 56pt, export and change-alert icons as on the main screen |
+| Name card | 66 | Replaces the tabs and the "תצוגה" panel: label "שם התלמיד/ה" 10.5pt semi-bold (glyphs from 16pt), name 14pt (glyphs from 37pt), underline at 57.5pt, rounded lower corners and soft shadow (light) |
+| Table offset | 10 | The table starts 10pt below the 58pt day bar |
 
 ## Typography
 

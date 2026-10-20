@@ -28,7 +28,13 @@ function placeholderItem(id: PlaceholderId, label: string, icon: IconName): NavI
 export const NAV_ITEMS: readonly NavItem[] = [
   { id: 'home', label: 'ריכוז מידע', icon: 'dashboard', route: { name: 'home' }, matches: (r) => r.name === 'home' },
   placeholderItem('messages', 'תיבת הודעות', 'mail'),
-  placeholderItem('student-card', 'כרטיס תלמיד', 'accountBox'),
+  {
+    id: 'student-card',
+    label: 'כרטיס תלמיד',
+    icon: 'accountBox',
+    route: { name: 'studentCard' },
+    matches: (r) => r.name === 'studentCard',
+  },
   placeholderItem('signatures', 'חתימות ואישורים', 'signDocument'),
   {
     id: 'schedule',
@@ -62,7 +68,6 @@ export const NAV_ITEMS: readonly NavItem[] = [
 
 export const PLACEHOLDER_TITLES: Record<PlaceholderId, string> = {
   messages: 'תיבת הודעות',
-  'student-card': 'כרטיס תלמיד',
   signatures: 'חתימות ואישורים',
   'weekly-planning': 'תכנון שבועי',
   'phone-book': 'ספר טלפונים',

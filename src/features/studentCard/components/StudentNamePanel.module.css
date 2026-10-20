@@ -1,0 +1,45 @@
+/*
+ * Measured on the Student Card timetable: a 66pt card with rounded lower corners and a soft
+ * shadow (the display-panel tokens), 16pt gutters, underline at 57.5pt, label 10.5pt
+ * semi-bold with its glyphs from 16pt, name 14pt with its glyphs from 37pt.
+ */
+.panel {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  height: 66px;
+  padding: 0 var(--page-gutter);
+  border-radius: 0 0 var(--display-panel-radius) var(--display-panel-radius);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-display-panel);
+}
+
+.field {
+  position: relative;
+  height: 58px;
+  border-bottom: 1px solid var(--color-input-line);
+}
+
+.label {
+  position: absolute;
+  top: 14.5px;
+  inset-inline: 0;
+  margin: 0;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-text-muted);
+}
+
+.name {
+  position: absolute;
+  top: 32px;
+  inset-inline: 0;
+  margin: 0;
+  font-size: var(--font-size-base);
+  line-height: 18px;
+  color: var(--color-display-value);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

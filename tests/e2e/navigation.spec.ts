@@ -35,24 +35,53 @@ test.describe('timetable view', () => {
     await expect(rows.nth(12).locator('th')).toHaveText('13. 18:25‐19:10');
   });
 
-  test('day selector and horizontal swipes change the day; vertical drags only scroll', async ({ page }) => {
+  test('swiping left or right never changes the day; only the day buttons do; vertical drags scroll', async ({ page }) => {
     await openApp(page);
     await page.getByRole('radio', { name: 'יום רביעי' }).click();
     await expect(tableDayHeader(page)).toHaveText('רביעי');
-
-    const box = await page.getByTestId('timetable-scroll').boundingBox();
+    const scroll = page.getByTestId('timetable-scroll');
+    const box = await scroll.boundingBox();
     if (!box) throw new Error('no scroll area');
-    const mid = { x: box.x + box.width / 2, y: box.y + 200 };
-    // RTL: dragging the finger to the right reveals the next day.
-    await touchDrag(page, mid, { x: mid.x + 150, y: mid.y + 6 });
-    await expect(tableDayHeader(page)).toHaveText('חמישי');
-    await touchDrag(page, mid, { x: mid.x - 150, y: mid.y });
+    const centre = box.x + box.width / 2;
+
+    // Swipe right and left — short and long, slow and fast, over lessons and empty cells.
+    const swipes: Array<[number, number, number]> = [
+      [150, box.y + 200, 8],
+      [-150, box.y + 200, 8],
+      [300, box.y + 60, 3],
+      [-300, box.y + 60, 3],
+      [200, box.y + 420, 2],
+      [-200, box.y + 420, 2],
+    ];
+    for (const [dx, y, steps] of swipes) {
+      await touchDrag(page, { x: centre - dx / 2, y }, { x: centre + dx / 2, y: y + 4 }, steps);
+      await expect(tableDayHeader(page)).toHaveText('רביעי');
+      await expect(page.getByRole('radio', { name: 'יום רביעי' })).toHaveAttribute('aria-checked', 'true');
+    }
+    // Mouse/pen drags (pointer events) do nothing either.
+    await page.mouse.move(centre - 120, box.y + 200);
+    await page.mouse.down();
+    await page.mouse.move(centre + 120, box.y + 200, { steps: 8 });
+    await page.mouse.up();
     await expect(tableDayHeader(page)).toHaveText('רביעי');
 
-    // A vertical drag scrolls and must not switch days.
-    await touchDrag(page, { x: mid.x, y: mid.y + 200 }, { x: mid.x + 20, y: mid.y - 150 });
-    await expect(tableDayHeader(page)).toHaveText('רביעי');
-    await expect.poll(() => page.getByTestId('timetable-scroll').evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
+    // Nothing in the timetable listens for touch or pointer gestures at all.
+    const cdp = await page.context().newCDPSession(page);
+    const { result } = await cdp.send('Runtime.evaluate', { expression: 'document.querySelector(\'[data-testid="timetable-scroll"]\')' });
+    const { listeners } = await cdp.send('DOMDebugger.getEventListeners', { objectId: result.objectId ?? '', depth: -1, pierce: true });
+    await cdp.detach();
+    expect(listeners.map((l) => l.type).filter((type) => /^(touch|pointer)/.test(type))).toEqual([]);
+
+    // Tapping a day button changes the day.
+    await page.getByRole('radio', { name: 'יום ראשון' }).click();
+    await expect(tableDayHeader(page)).toHaveText('ראשון');
+    await page.getByRole('radio', { name: 'יום חמישי' }).click();
+    await expect(tableDayHeader(page)).toHaveText('חמישי');
+
+    // A vertical drag scrolls natively and keeps the day.
+    await touchDrag(page, { x: centre, y: box.y + 400 }, { x: centre + 20, y: box.y + 50 });
+    await expect(tableDayHeader(page)).toHaveText('חמישי');
+    await expect.poll(() => scroll.evaluate((el) => el.scrollTop)).toBeGreaterThan(0);
   });
 
   test('scroll-to-top button appears after scrolling and returns to the top', async ({ page }) => {

@@ -11,7 +11,7 @@ import {
 } from '../../src/features/events/domain/eventOps';
 import { greetingLine } from '../../src/features/home/domain/greeting';
 import { changesForDate, sortNotices } from '../../src/features/notices/domain/noticeOps';
-import { adjacentDay, dayIdForDate, defaultDayForDate } from '../../src/features/timetable/domain/days';
+import { dayIdForDate, defaultDayForDate } from '../../src/features/timetable/domain/days';
 import { currentPeriodIndex, formatPeriodLabel, validatePeriods } from '../../src/features/timetable/domain/periods';
 import { timetableToIcsEvents } from '../../src/features/timetable/domain/timetableExport';
 import { DEFAULT_PERIODS } from '../../src/data/periods';
@@ -52,8 +52,6 @@ describe('days and periods', () => {
     expect(dayIdForDate(new Date(2026, 9, 19))).toBe('mon');
     expect(dayIdForDate(new Date(2026, 9, 23))).toBeNull();
     expect(defaultDayForDate(new Date(2026, 9, 24))).toBe('sun');
-    expect(adjacentDay('sun', -1)).toBeNull();
-    expect(adjacentDay('wed', 1)).toBe('thu');
   });
 
   it('formats period labels like the reference', () => {

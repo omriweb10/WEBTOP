@@ -1,5 +1,5 @@
 /** School-week day metadata and date→day rules (Sunday–Thursday). */
-import { DAY_IDS, type DayId } from '../../../schemas/timetable';
+import type { DayId } from '../../../schemas/timetable';
 
 export interface DayInfo {
   id: DayId;
@@ -34,10 +34,4 @@ export function dayIdForDate(date: Date): DayId | null {
 /** Day the timetable opens on: today if it is a school day, otherwise Sunday. */
 export function defaultDayForDate(date: Date): DayId {
   return dayIdForDate(date) ?? 'sun';
-}
-
-/** Returns the neighbouring school day (no wrap-around), or null at either end of the week. */
-export function adjacentDay(day: DayId, step: 1 | -1): DayId | null {
-  const index = DAY_IDS.indexOf(day) + step;
-  return DAY_IDS[index] ?? null;
 }

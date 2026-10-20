@@ -26,8 +26,8 @@ It runs in one of two modes, chosen at build time:
 ## Features
 
 - **Timetable** for Sunday–Thursday with up to 13 periods (bell times taken from the reference).
-  Includes a day selector, swipe navigation that never fights vertical scrolling, and a
-  scroll-to-top button. Empty periods are real rows.
+  Includes a day selector (the only way to change the day — the table has no swipe gestures,
+  just native vertical scrolling) and a scroll-to-top button. Empty periods are real rows.
 - **שינויים והודעות** and **אירועים ומבחנים** tabs backed by local data. The events tab has a
   month view, a kind filter, a group filter and `.ics` export.
 - **ריכוז מידע** home screen: Hebrew date, greeting, editable shortcuts, today's lessons.
@@ -225,7 +225,7 @@ src/
 ├── features/
 │   ├── timetable/       components/ (TimetableTab, TimetableTable, LessonCard, EmptyPeriod,
 │   │                    DaySelector, LessonEditor, MoveCopyPanel, export sheet, print layout),
-│   │                    hooks/ (swipe, scroll), domain/ (pure: ops, days, periods, drafts, ICS),
+│   │                    hooks/ (scroll), domain/ (pure: ops, days, periods, drafts, ICS),
 │   │                    timetableActions (undoable use-cases), view store
 │   ├── presets/         Preset picker/manager/form + pure preset↔lesson rules + actions
 │   ├── admin/           7-tap detector, edit-mode store and capabilities (who may enter),
@@ -287,13 +287,19 @@ Design rules followed:
   launches, so after switching theme inside a running app the band under the status bar stays
   navy (legible white status text) until the next launch.
 - The manifest colours and launch images stay dark: they are fixed at install time.
-- The app frame is pinned to the viewport box (`position: fixed; inset: 0` in
-  `src/app/App.module.css`) instead of being sized with `100vh`/`100dvh`. In a Home Screen app
-  with the translucent status bar, WebKit resolves those units to the screen height minus the
-  status bar, which left an empty dark band (status bar + home indicator high) under the
-  timetable. The viewport box always matches the real web view, so both themes share one
-  layout; the safe-area bands come from `env(safe-area-inset-*)`. `tests/e2e/layout.spec.ts`
-  checks the frame, the insets and the last timetable row in both themes.
+- The app frame is pinned to the viewport (`position: fixed; inset: 0` in
+  `src/app/App.module.css`), never sized with `100vh`/`100dvh`, and the safe-area bands come
+  from `env(safe-area-inset-*)`.
+- iOS 26 Home Screen apps with the translucent status bar get a viewport one status bar
+  (62pt) shorter than the screen ([WebKit bug 301108](https://bugs.webkit.org/show_bug.cgi?id=301108)),
+  and WebKit does not draw fixed content below that edge: an empty band (status bar + home
+  indicator high) appeared under the timetable. Once the page is as tall as the screen, iOS
+  gives it the full viewport, so in standalone mode `html` gets
+  `min-height: min(100lvh, calc(100% + var(--safe-top)))` (`src/styles/global.css`). The top
+  inset is 0 with an opaque status bar, so nothing changes there; the `100lvh` cap keeps a page
+  that already fills the screen from scrolling; Safari tabs are unaffected.
+  `tests/e2e/layout.spec.ts` checks the frame, the insets, the last timetable row and the
+  no-scroll cap in both themes (Chromium cannot reproduce the short iOS viewport itself).
 
 ### Backup file format
 
@@ -321,10 +327,11 @@ day must have exactly one cell per period: a lesson object or `null` for an empt
 - Unit tests (Vitest): timetable operations, preset propagation and overrides, storage
   versioning/migration/quarantine, backup validation, ICS, Hebrew dates, the tap gesture.
 - E2E (Playwright, Chromium with iPhone viewport and touch): day/tab/sidebar navigation, real
-  touch swipes vs vertical scroll, the FAB, edit-mode unlock and exit, preset fill, overrides,
-  empty↔lesson, duplicate/move/delete/undo, preset propagation with confirmation, resets,
-  JSON export/import (valid and invalid), notices/exams persistence, change alerts, corrupted
-  storage handling, manifest/icons, offline reload, cleanup of old caches, and a clean console.
+  touch swipes that never change the day while vertical drags scroll, the FAB, edit-mode
+  unlock and exit, preset fill, overrides, empty↔lesson, duplicate/move/delete/undo, preset
+  propagation with confirmation, resets, JSON export/import (valid and invalid), notices/exams
+  persistence, change alerts, corrupted storage handling, manifest/icons, offline reload,
+  cleanup of old caches, the app frame and safe areas in both themes, and a clean console.
 - Visual: screenshots at the reference geometry were compared frame-by-frame with the
   recording. See `docs/visual-spec.md`.
 

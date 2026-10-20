@@ -1,13 +1,11 @@
-import { useCallback, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { ScrollTopButton } from '../../../components/ui/ScrollTopButton';
 import { UnderlineSelect } from '../../../components/ui/UnderlineSelect';
 import { accountMode } from '../../../config/backend';
 import { useProfileStore, useTimetableStore } from '../../../store/dataStores';
 import { useIsEditing } from '../../admin/editModeStore';
-import { adjacentDay } from '../domain/days';
 import type { Slot } from '../domain/timetableOps';
 import { useScrolledPast } from '../hooks/useScrolledPast';
-import { useSwipeNavigation } from '../hooks/useSwipeNavigation';
 import { useTimetableViewStore } from '../timetableViewStore';
 import { AssignedLessonEditor } from './AssignedLessonEditor';
 import { ChangeAlert } from './ChangeAlert';
@@ -17,8 +15,9 @@ import { TimetableTable } from './TimetableTable';
 import styles from './TimetableTab.module.css';
 
 /**
- * "מערכת שעות" tab: display selector, day selector and the scrollable day table.
- * Horizontal swipes change the day (RTL: swiping right reveals the next day).
+ * "מערכת שעות" tab: display selector, day selector and the scrollable day table. The day
+ * changes only by tapping the day buttons; the table itself has no gestures besides
+ * native vertical scrolling.
  */
 export function TimetableTab() {
   const timetable = useTimetableStore((state) => state.value);
@@ -30,19 +29,7 @@ export function TimetableTab() {
   const [editSlot, setEditSlot] = useState<Slot | null>(null);
 
   const scrollRef = useRef<HTMLDivElement>(null);
-  const feedbackRef = useRef<HTMLDivElement>(null);
   const scrolled = useScrolledPast(scrollRef);
-
-  const nextDay = useCallback(() => {
-    const next = adjacentDay(day, 1);
-    if (next) selectDay(next);
-  }, [day, selectDay]);
-  const previousDay = useCallback(() => {
-    const previous = adjacentDay(day, -1);
-    if (previous) selectDay(previous);
-  }, [day, selectDay]);
-
-  useSwipeNavigation(scrollRef, { onSwipeRight: nextDay, onSwipeLeft: previousDay, feedbackRef });
 
   return (
     <>
@@ -51,7 +38,7 @@ export function TimetableTab() {
       <DaySelector value={day} onChange={selectDay} />
       <div ref={scrollRef} className={styles.scroll} data-testid="timetable-scroll">
         <ChangeAlert day={day} />
-        <div ref={feedbackRef} className={styles.tableWrap}>
+        <div className={styles.tableWrap}>
           <TimetableTable
             key={day}
             timetable={timetable}

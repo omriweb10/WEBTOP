@@ -1,4 +1,4 @@
-/** Non-persisted view state of the timetable (selected day, swipe direction for animation). */
+/** Non-persisted view state of the timetable (selected day, direction of the last day change). */
 import { create } from 'zustand';
 import type { DayId } from '../../schemas/timetable';
 import { defaultDayForDate } from './domain/days';

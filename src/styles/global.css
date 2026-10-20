@@ -12,6 +12,21 @@ html {
   text-size-adjust: 100%;
 }
 
+/*
+ * Home Screen app with the translucent status bar (iOS 26): WebKit makes the viewport one
+ * status bar shorter than the screen (WebKit bug 301108) and does not draw fixed content
+ * below that edge, which left an empty band under the app frame. Once the page is as tall
+ * as the screen, iOS gives it the full viewport and the fixed frame reaches the bottom.
+ * The extra height is the top inset, so nothing changes with an opaque status bar (inset
+ * 0); the large-viewport cap keeps a page that already fills the screen from scrolling.
+ * Safari tabs are unaffected.
+ */
+@media (display-mode: standalone) {
+  html {
+    min-height: min(100lvh, calc(100% + var(--safe-top)));
+  }
+}
+
 body {
   margin: 0;
   min-height: 100%;

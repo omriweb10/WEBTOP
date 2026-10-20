@@ -106,9 +106,9 @@ brief's initial table for the subjects the screenshot does not show.
 
 ## Interactions (observed → implemented)
 
-- Tapping a day letter switches the table, keeping the scroll position. Horizontal swipes also
-  switch days (RTL: swipe right = next day) via `touch-action: pan-y`, so vertical inertial
-  scrolling is never blocked.
+- Tapping a day letter switches the table, keeping the scroll position. This is the only way
+  to change the day: horizontal swipes on the table do nothing, and vertical scrolling is
+  native.
 - The tab change cross-fades the content, as in the reference.
 - The drawer slides in from the right over a light backdrop. It closes on Escape, a backdrop
   tap, or by choosing an item.

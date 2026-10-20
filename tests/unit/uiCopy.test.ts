@@ -86,4 +86,11 @@ describe('app frame', () => {
     // to the screen minus the status bar, leaving an empty band under the frame.
     expect(shell).not.toMatch(/\d+(?:d|s|l)?vh/);
   });
+
+  it('lets an installed app use the whole screen under a translucent status bar', () => {
+    const css = readFileSync(path.join(SRC, 'styles/global.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    // iOS 26 shortens the viewport by the status bar until the page is as tall as the screen;
+    // the cap keeps a page that already fills the screen from scrolling.
+    expect(css).toMatch(/@media \(display-mode: standalone\)\s*{\s*html\s*{\s*min-height: min\(100lvh, calc\(100% \+ var\(--safe-top\)\)\);/);
+  });
 });

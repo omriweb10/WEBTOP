@@ -69,3 +69,37 @@ test('dark and light share the same frame and bottom layout', async ({ browser }
   }
   expect(results[0]).toEqual(results[1]);
 });
+
+test('installed app: the full-screen page rule never makes the page scroll, with or without a status-bar inset', async ({ page }) => {
+  await openApp(page);
+  // Chromium cannot run as an installed iOS app, so take the app's standalone-only rule
+  // exactly as compiled and apply it directly.
+  const standaloneCss = await page.evaluate(() => {
+    for (const sheet of Array.from(document.styleSheets)) {
+      for (const rule of Array.from(sheet.cssRules)) {
+        if (rule instanceof CSSMediaRule && rule.conditionText.includes('display-mode: standalone')) {
+          return Array.from(rule.cssRules, (inner) => inner.cssText).join('\n');
+        }
+      }
+    }
+    return '';
+  });
+  expect(standaloneCss).toMatch(/html\s*{\s*min-height: min\(100lvh,\s*calc\(100% \+ var\(--safe-top\)\)\);?\s*}/);
+  await page.addStyleTag({ content: standaloneCss });
+
+  // Opaque status bar (no top inset) and translucent status bar (62pt inset) on a viewport
+  // that already fills the screen: the page is exactly the screen and cannot scroll.
+  for (const inset of [0, TOP_INSET]) {
+    await page.addStyleTag({ content: `:root:root { --safe-top: ${inset}px; --safe-bottom: ${BOTTOM_INSET}px; }` });
+    const m = await page.evaluate(() => {
+      window.scrollTo(0, 500);
+      return {
+        viewport: window.innerHeight,
+        page: document.documentElement.scrollHeight,
+        scrollY: window.scrollY,
+        frameBottom: document.querySelector('#root > div:first-child')?.getBoundingClientRect().bottom,
+      };
+    });
+    expect(m).toEqual({ viewport: m.viewport, page: m.viewport, scrollY: 0, frameBottom: m.viewport });
+  }
+});

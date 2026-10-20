@@ -22,6 +22,20 @@ export async function createPreset(profileId: string | null, fields: PresetField
   await unwrap(db().from('subject_presets').insert({ ...fields, profile_id: profileId }));
 }
 
+/**
+ * Creates several presets in one student's list with a single insert, so either all of
+ * them are created or none (the database checks the admin, the student and every field).
+ */
+export async function createPresets(profileId: string, list: readonly PresetFields[]): Promise<void> {
+  if (list.length === 0) return;
+  await unwrap(db().from('subject_presets').insert(list.map((fields) => ({ ...fields, profile_id: profileId }))));
+}
+
+/** Overwrites a preset's subject, teacher, room and colour, and makes it selectable again. */
+export async function replacePresetDetails(id: string, fields: Pick<PresetFields, 'name' | 'teacher' | 'room' | 'color'>): Promise<void> {
+  await unwrap(db().from('subject_presets').update({ ...fields, archived_at: null }).eq('id', id));
+}
+
 /** Updates a preset; only its owner (or the library's templates) is affected. */
 export async function updatePreset(id: string, fields: Partial<PresetFields>): Promise<void> {
   await unwrap(db().from('subject_presets').update(fields).eq('id', id));

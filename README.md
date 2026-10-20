@@ -77,7 +77,16 @@ It runs in one of two modes, chosen at build time:
     page (Users → user → מקצועות): add, edit, duplicate, hide or remove subjects with name,
     teacher, room and colour; add several at once from the library or copy all/selected from
     another student. Copies are independent, so changing one student's subjects never affects
-    anyone else. Removing a subject that is in use asks first: move its lessons to another
+    anyone else.
+  - **Import subjects from text** ("ייבוא מקצועות מטקסט" on the same tab): paste blocks of
+    `מקצוע : …` / `שם מורה : …` / `חדר : …` / `צבע : …` (an empty line between subjects) into a
+    notepad-style editor. The text is parsed as you type (any spacing, Windows/Unix line
+    endings, `#RRGGBB` or Hebrew colour names such as כחול, אדום, ירוק, צהוב, כתום, סגול, אפור,
+    ורוד, טורקיז); problems are listed per subject and field and the text stays for correcting.
+    Subjects the student already has are skipped, or updated only if the admin chooses so, and
+    the counts of created/skipped/updated subjects are shown before "צור מקצועות" creates them —
+    for that student only, in one all-or-nothing insert. Timetables are not touched. It uses
+    the existing per-user subject table and its permissions, so no database change is needed. Removing a subject that is in use asks first: move its lessons to another
     subject, empty those periods, or only hide it.
   - **Subject library** (מאגר): the admin's subjects for templates and as a copy source; no
     student ever sees it.
@@ -354,7 +363,8 @@ day must have exactly one cell per period: a lesson object or `null` for an empt
   - **E2E** (Playwright against the stack): admin sign-in and non-admin rejection; create a
     student, upload and crop a picture, weak custom code opt-in, show-once codes and
     replacement; per-user subjects (add, copy from the library and from another user, edit,
-    duplicate, warn-before-remove with replacement, hide) and per-student timetable editing;
+    duplicate, warn-before-remove with replacement, hide, import from pasted text with
+    validation, duplicate handling and per-student ownership) and per-student timetable editing;
     template building and the customised-timetable confirmation; library CRUD/archive; sessions
     dashboard force
     disconnect; student sign-in, persistence across reloads and token expiry, second device

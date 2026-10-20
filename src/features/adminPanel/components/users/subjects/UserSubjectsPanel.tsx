@@ -17,6 +17,7 @@ import { EmptyView, ErrorView, LoadingView } from '../../shared/StatusViews';
 import presetStyles from '../../presets/presets.module.css';
 import { CopySubjectsDialog, type CopySource } from './CopySubjectsDialog';
 import { RemoveSubjectDialog } from './RemoveSubjectDialog';
+import { SubjectImportDialog } from './import/SubjectImportDialog';
 
 type Editing = { kind: 'new' } | { kind: 'edit'; preset: PresetRow } | { kind: 'duplicate'; preset: PresetRow } | null;
 
@@ -30,6 +31,7 @@ export function UserSubjectsPanel({ user }: { user: UserOverview }) {
   const [editing, setEditing] = useState<Editing>(null);
   const [copyFrom, setCopyFrom] = useState<CopySource | null>(null);
   const [removing, setRemoving] = useState<PresetRow | null>(null);
+  const [importing, setImporting] = useState(false);
 
   if (!data) {
     if (status === 'error' && error) return <ErrorView message={error} onRetry={() => void reload()} />;
@@ -81,6 +83,9 @@ export function UserSubjectsPanel({ user }: { user: UserOverview }) {
         </Button>
         <Button icon="group" onClick={() => setCopyFrom('user')}>
           העתקה ממשתמש אחר
+        </Button>
+        <Button icon="description" onClick={() => setImporting(true)}>
+          ייבוא מקצועות מטקסט
         </Button>
       </div>
       <FilterChips
@@ -149,6 +154,7 @@ export function UserSubjectsPanel({ user }: { user: UserOverview }) {
       {copyFrom && (
         <CopySubjectsDialog target={user} targetPresets={data} initialSource={copyFrom} onClose={() => setCopyFrom(null)} onCopied={() => void reload()} />
       )}
+      {importing && <SubjectImportDialog user={user} presets={data} onClose={() => setImporting(false)} onImported={() => void reload()} />}
       {removing && (
         <RemoveSubjectDialog
           user={user}

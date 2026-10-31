@@ -1,0 +1,113 @@
+/*
+ * Webtop's day timetable as a CSS grid, measured from its DOM at a 393px viewport:
+ * two columns — 25% for the period times (right), 75% for the lessons (left); a 45px
+ * sticky header; empty periods 34.5333px; lesson rows as tall as their card. The grid
+ * fills its container (361.07px at 393px, i.e. the 16px page gutters), so it scales with
+ * the screen. Grid lines are drawn with inset shadows and an overlay so they add no size.
+ */
+.grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: var(--timetable-header-height);
+  grid-auto-rows: minmax(var(--timetable-row-min), auto);
+  width: 100%;
+  min-width: 0;
+  background: var(--color-surface);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-dense);
+  animation: day-in var(--duration-medium) var(--ease-standard);
+}
+
+/* The outer outline, over the cells. */
+.grid::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border: 1px solid var(--color-table-outline);
+  pointer-events: none;
+}
+
+.fromLeft {
+  --day-in-offset: -18px;
+}
+
+.fromRight {
+  --day-in-offset: 18px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: var(--timetable-time-column) var(--timetable-lesson-column);
+  min-width: 0;
+}
+
+/* Header: stays at the top of the scrolling timetable. */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.headCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: var(--timetable-header-padding);
+  background: var(--color-table-header);
+  box-shadow: inset 0 -1px 0 var(--color-border);
+  color: var(--color-table-head-text);
+  font-weight: 700;
+  text-align: center;
+}
+
+.headCell:first-child,
+.time {
+  border-inline-end: 1px solid var(--color-border);
+}
+
+.time {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: var(--period-padding) 0;
+  box-shadow: inset 0 -1px 0 var(--color-border);
+  color: var(--color-period-text);
+  /*
+   * 12px bold, as measured. "10. 16:00‐16:45" is then 87.5px wide, which fits the 25%
+   * column from a ~386px-wide screen; on narrower phones the labels shrink with the
+   * column (a quarter of 100vw − 32px gutters, less 2px, × 12/87.5) instead of overflowing.
+   */
+  font-size: min(var(--font-size-sm), calc((100vw - 40px) * 0.034));
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.slot {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  box-shadow: inset 0 -1px 0 var(--color-border);
+}
+
+/* Each card keeps 4px of space inside its cell; consecutive lessons stay separate cards. */
+.slot > .card {
+  width: auto;
+  margin: var(--card-margin);
+}
+
+@keyframes day-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--day-in-offset, 0));
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -39,12 +39,11 @@ the colour the reference shows behind the system UI.
 | "תצוגה" panel | 64 | Label 10 pt at ~13 pt from top; value 13 pt; 1 pt underline `#353a47` at 55 pt; ▾ arrow at the far left |
 | Gap | 8 | page colour `#12161c` |
 | Day bar | 58 | bg `#1b1f27`. Five letters spaced with `space-between`; first and last circles touch the 16 pt gutters. Active day: 32 pt circle `#45aba0`, dark letter |
-| Table | inset 16 pt | 1 pt grid `#2d323f`, outer border `#272f3f` |
-| Table header row | 45 | bg `#252d3c`, 12 pt bold, "שעה/יום" plus day name |
-| Period column | 92 wide | 12 pt bold, centred. "8:50-8:00 .1" visual order, reproduced with the bidi-neutral U+2010 hyphen |
-| Lesson cell | 4 pt padding | |
-| Lesson card | 61 tall (3 lines), 43 (2 lines) | 18 pt line height, centred 12 pt text (subject bold), 4 pt accent on the start (right) edge, 3 pt radius |
-| Empty period row | 34 | blank cell. Rows are never removed |
+| Timetable | inset 16 pt | A CSS grid (see "Timetable grid" below). 1 pt lines `#2d323f`, outline `#272f3f` |
+| Header row | 45 | bg `#252d3c`, 12 pt bold, "שעה/יום" plus day name; sticky |
+| Period column | 25 % | 12 pt bold, centred. "8:50-8:00 .1" visual order, reproduced with the bidi-neutral U+2010 hyphen |
+| Lesson card | 62 tall (3 lines) | 4 pt margin, padding and radius; 18 pt line height, centred 12 pt text (subject bold), 4 pt accent on the start (right) edge |
+| Empty period row | 34.5333 | blank cell. Rows are never removed |
 | Space below last row | 72 | clears the FAB |
 | Scroll-to-top FAB | 56 | white, bottom-right, 16 pt from the right and bottom edges; appears after scrolling |
 | Sidebar | 321 wide | header 111 pt (`#0f2135` + waves), subtitle row 46 pt, items 46 pt, 20 pt icons, active item `#a8caf6` bold plus 4 pt bar |
@@ -62,6 +61,20 @@ Same app bar, day bar and table as the main timetable, with three differences:
 | App bar | 55 | Back arrow where the menu button is (centred 36pt from the right edge), title "מערכת שעות" from 56pt, export and change-alert icons as on the main screen |
 | Name card | 66 | Replaces the tabs and the "תצוגה" panel: label "שם התלמיד/ה" 10.5pt semi-bold (glyphs from 16pt), name 14pt (glyphs from 37pt), underline at 57.5pt, rounded lower corners and soft shadow (light) |
 | Table offset | 10 | The table starts 10pt below the 58pt day bar |
+
+### Timetable grid (measured from Webtop's DOM at a 393px viewport)
+
+| Measurement | Webtop | This app | Notes |
+|---|---|---|---|
+| Layout | CSS grid, 2 columns | CSS grid: a 45px header row, then one row per period, each `25% 75%` | `role="table"` with rows, row headers and cells |
+| Width at 393px | 361.07 | 361 | 100% of the space between the 16px gutters, so it follows the screen (328 at 360, 398 at 430) |
+| Columns | 25% times (right) · 75% lessons (left) | same | |
+| Header | 45, `#EFF2F7`, padding 8px 4px, bold 12px, centred, sticky | same (dark theme keeps its own header colour) | |
+| Empty period | 34.5333 | 34.53 (Chromium rounds to 1/64 px) | minimum row height |
+| Lesson row, 3-line card | 69.5333 | 70 | 4px margin + 4px padding + 3 × 18px lines + 4px + 4px = 70; reaching 69.5333 would need clipped text, so rows grow to their card |
+| Card | 4px margin, padding, radius; 12px/18px; bold subject; coloured right edge; subject colour at 20% | same | the 20% tint is the colour mixed into the white cell (identical result); dark mode keeps the 16% measured from the dark recording |
+| Top margin | 46 | 0 on the main screen, 10 on the Student Card | Webtop reserves 46px above the grid for its day selector; here the day bar (58pt, measured) is its own element directly above the grid, so the table starts where the recording and screenshots show it |
+| Period labels | — | 12px bold from a ~386px-wide screen | below that they shrink with the 25% column (9.5px at 320) instead of overflowing; not measured in Webtop at those widths |
 
 ## Typography
 
@@ -107,7 +120,7 @@ panel's rounded lower corners and soft shadow.
 | Tabs | white, `#1d1d1d` labels; active tab and underline `#1d3e61`; `#e2e5eb` divider |
 | Display panel | white, `#e1e1e1` underline, 8 pt lower radius, soft shadow; `#efefef` gap below |
 | Day selector | white, `#1d1d1d` letters; selected `#25a89d` circle with white letter |
-| Table | header `#eff3f6`, grid `#e6e8ee`, white cells, bold `#1b1b1b` period labels |
+| Table | header `#eff2f7` (Webtop's DOM value), grid `#e6e8ee`, white cells, bold `#1b1b1b` period labels |
 | Lesson cards | accent edge unchanged; background = accent mixed into white at **20 %** |
 | Bands | `#f6f6f6` home-indicator band |
 
@@ -123,7 +136,8 @@ brief's initial table for the subjects the screenshot does not show.
 - The tab change cross-fades the content, as in the reference.
 - The drawer slides in from the right over a light backdrop. It closes on Escape, a backdrop
   tap, or by choosing an item.
-- The table header row scrolls with the table; the app bar, tabs, display panel and day bar stay fixed.
+- The header row of the timetable stays at the top while the lessons scroll (sticky); the app
+  bar, tabs, display panel and day bar stay fixed.
 
 ## Deliberate deviations & assumptions
 

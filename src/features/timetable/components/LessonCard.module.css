@@ -1,11 +1,15 @@
-/* Measured: 61pt tall for three 18pt lines, 4pt accent on the start (right) edge, 3pt radius. */
+/*
+ * Measured from Webtop's timetable: 12px text on 18px lines (bold subject, then teacher and
+ * room), 4px padding and radius, a coloured right (start) edge; the background is the
+ * subject colour at 20% in light mode (see lessonCardColors.ts). Three lines = 62px.
+ */
 .card {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 3.5px 8px;
+  padding: var(--card-padding);
   border: 0;
   border-inline-start: var(--card-accent-width) solid var(--lesson-accent);
   border-radius: var(--card-radius);

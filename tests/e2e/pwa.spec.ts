@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { dayTable, openApp } from './helpers';
+import { openApp, periodRows } from './helpers';
 
 test.describe('PWA', () => {
   test('manifest, icons and iOS meta tags are served under /WEBTOP/', async ({ page, request }) => {
@@ -32,7 +32,7 @@ test.describe('PWA', () => {
     await context.setOffline(true);
     await page.reload();
     await expect(page.getByRole('heading', { name: 'מ. שעות ושינויים' })).toBeVisible();
-    await expect(dayTable(page).locator('tbody tr')).toHaveCount(13);
+    await expect(periodRows(page)).toHaveCount(13);
     await page.goto('#/settings');
     await expect(page.getByText(/^פעיל/)).toBeVisible();
     await context.setOffline(false);

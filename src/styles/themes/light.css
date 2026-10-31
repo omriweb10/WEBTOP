@@ -55,7 +55,7 @@
   --color-on-fab: #1f232b;
 
   /* Lines */
-  --color-table-header: #eff3f6;
+  --color-table-header: #eff2f7; /* Webtop's day-header colour (from its DOM) */
   --color-table-outline: #e5e7eb;
   --color-border: #e6e8ee;
   --color-divider: #e2e5eb;

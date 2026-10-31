@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
-import { dayTable, openApp, unlockEditMode } from './helpers';
+import { dayTable, openApp, periodRows, unlockEditMode } from './helpers';
 
-const firstRow = (page: Page) => dayTable(page).locator('tbody tr').first();
+const firstRow = (page: Page) => periodRows(page).first();
 
 test.describe('local data: import/export, notices and events', () => {
   test('exports a valid JSON backup', async ({ page }) => {
@@ -58,7 +58,7 @@ test.describe('local data: import/export, notices and events', () => {
 
     await page.goto('#/schedule/timetable');
     await expect(firstRow(page)).toContainText('מקצוע מיובא');
-    await expect(dayTable(page).locator('tbody th').first()).toHaveText('1. 8:00‐8:45');
+    await expect(dayTable(page).getByRole('rowheader').first()).toHaveText('1. 8:00‐8:45');
     await expect(page.getByRole('combobox', { name: 'תצוגה' })).toContainText("י' 9");
     await page.reload();
     await expect(firstRow(page)).toContainText('מורה מיובא');
@@ -107,7 +107,7 @@ test.describe('local data: import/export, notices and events', () => {
       }
     });
     await openApp(page);
-    await expect(dayTable(page).locator('tbody tr')).toHaveCount(13);
+    await expect(periodRows(page)).toHaveCount(13);
     await expect(page.getByRole('alert')).toContainText('נשמר עותק גיבוי');
     const keys = await page.evaluate(() => Object.keys(localStorage));
     expect(keys.some((k) => k.startsWith('webtop-pwa:timetable.corrupt.'))).toBe(true);

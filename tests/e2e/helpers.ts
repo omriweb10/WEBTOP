@@ -1,5 +1,5 @@
 /** Shared helpers for the end-to-end suite. */
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 
 /** Monday 19 Oct 2026, 09:06 Israel time — the moment the reference recording was taken. */
 export const FIXED_NOW = new Date('2026-10-19T09:06:00+03:00');
@@ -44,7 +44,17 @@ export function dayTable(page: Page) {
 
 /** Name of the day shown in the table header (e.g. "שני"). */
 export function tableDayHeader(page: Page) {
-  return dayTable(page).locator('thead th').nth(1);
+  return dayTable(page).getByRole('columnheader').nth(1);
+}
+
+/** The visible day's period rows, in order (the header row excluded). */
+export function periodRows(page: Page) {
+  return dayTable(page).getByRole('row').filter({ has: page.getByRole('rowheader') });
+}
+
+/** The lesson card (or, in edit mode, the add button) in a period row. */
+export function lessonCard(row: Locator) {
+  return row.getByRole('cell').locator(':scope > *').first();
 }
 
 /** Simulates a real one-finger touch drag through the Chrome DevTools Protocol. */

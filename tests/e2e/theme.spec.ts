@@ -1,11 +1,11 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { dayTable, openApp } from './helpers';
+import { dayTable, lessonCard, openApp, periodRows } from './helpers';
 
 /** Computed style property of the first matching element. */
 const css = (locator: Locator, property: string) => locator.evaluate((el, p) => getComputedStyle(el).getPropertyValue(p), property);
 
 /** The lesson card in a period row (1-based) of the visible day. */
-const card = (page: Page, period: number) => dayTable(page).locator('tbody tr').nth(period - 1).locator('td > div').first();
+const card = (page: Page, period: number) => lessonCard(periodRows(page).nth(period - 1));
 
 /** WCAG contrast ratio between two "rgb(r, g, b)" colours. */
 function contrast(a: string, b: string): number {
@@ -51,7 +51,7 @@ test.describe('themes', () => {
     const selectedDay = page.getByRole('radio', { name: 'יום שני', exact: true }).locator('span').first();
     expect(await css(selectedDay, 'background-color')).toBe('rgb(37, 168, 157)');
     expect(await css(selectedDay, 'color')).toBe('rgb(255, 255, 255)');
-    expect(await css(dayTable(page).locator('thead th').first(), 'background-color')).toBe('rgb(239, 243, 246)');
+    expect(await css(dayTable(page).getByRole('columnheader').first(), 'background-color')).toBe('rgb(239, 242, 247)'); // Webtop's #EFF2F7
 
     // Same subject colour on the edge, pastel tint behind dark text.
     expect(await css(card(page, 1), 'border-right-color')).toBe('rgb(255, 190, 16)');
@@ -59,7 +59,7 @@ test.describe('themes', () => {
     expect(await css(card(page, 2), 'background-color')).toBe('rgb(253, 219, 206)'); // לשון #f4490c
 
     // Empty periods stay plain white rows: no placeholder card outside edit mode.
-    const emptyRow = dayTable(page).locator('tbody tr').nth(8);
+    const emptyRow = periodRows(page).nth(8);
     await expect(emptyRow.getByRole('button')).toHaveCount(0);
     expect(await css(page.getByTestId('timetable-scroll'), 'background-color')).toBe('rgb(255, 255, 255)');
 
@@ -104,8 +104,8 @@ test.describe('themes', () => {
     const pairs: Array<[Locator, Locator]> = [
       [page.getByRole('banner').getByRole('heading'), page.getByRole('banner')],
       [page.getByRole('tab', { name: 'שינויים והודעות' }), page.getByRole('tablist')],
-      [dayTable(page).locator('thead th').first(), dayTable(page).locator('thead th').first()],
-      [dayTable(page).locator('tbody th').first(), page.getByTestId('timetable-scroll')],
+      [dayTable(page).getByRole('columnheader').first(), dayTable(page).getByRole('columnheader').first()],
+      [dayTable(page).getByRole('rowheader').first(), page.getByTestId('timetable-scroll')],
       [card(page, 1), card(page, 1)],
       [card(page, 4), card(page, 4)],
     ];

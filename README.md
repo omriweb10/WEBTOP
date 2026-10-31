@@ -237,7 +237,7 @@ src/
 │   └── ui/              Button, IconButton, Icon (+generated Material Symbols paths), Modal,
 │                        ConfirmHost/confirm(), fields, ColorPicker, SectionCard, ItemRow, Toasts…
 ├── features/
-│   ├── timetable/       components/ (TimetableTab, TimetableTable, LessonCard, EmptyPeriod,
+│   ├── timetable/       components/ (TimetableTab, grid/ TimetableGrid, LessonCard, EmptyPeriod,
 │   │                    DaySelector, LessonEditor, MoveCopyPanel, export sheet, print layout),
 │   │                    hooks/ (scroll), domain/ (pure: ops, days, periods, drafts, ICS),
 │   │                    timetableActions (undoable use-cases), view store

@@ -1,5 +1,5 @@
 /** Shared steps for the account-mode e2e tests (browser + the local stack). */
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import { deflateSync, crc32 } from 'node:zlib';
 import { env } from '../backend/helpers';
 
@@ -8,6 +8,16 @@ export { adminClient, createStudent, createUserPreset, env, sql, stackAvailable,
 /** The on-screen day table (the print-only week table is excluded). */
 export function dayTable(page: Page) {
   return page.getByRole('table', { name: /מערכת שעות ליום/ });
+}
+
+/** The visible day's period rows, in order (the header row excluded). */
+export function periodRows(page: Page) {
+  return dayTable(page).getByRole('row').filter({ has: page.getByRole('rowheader') });
+}
+
+/** The lesson card (or, in edit mode, the add button) in a period row. */
+export function lessonCard(row: Locator) {
+  return row.getByRole('cell').locator(':scope > *').first();
 }
 
 /** Signs in to the admin panel. */

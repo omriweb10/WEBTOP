@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { dayTable, openApp, tableDayHeader, touchDrag, trackErrors } from './helpers';
+import { dayTable, openApp, periodRows, tableDayHeader, touchDrag, trackErrors } from './helpers';
 
 test.describe('timetable view', () => {
   test('loads under /WEBTOP/ on today with all 13 periods and a clean console', async ({ page }) => {
@@ -9,17 +9,17 @@ test.describe('timetable view', () => {
     await expect(page.getByRole('tab', { name: 'מערכת שעות' })).toHaveAttribute('aria-selected', 'true');
     await expect(page.getByRole('radio', { name: 'יום שני' })).toHaveAttribute('aria-checked', 'true');
     await expect(tableDayHeader(page)).toHaveText('שני');
-    await expect(dayTable(page).locator('tbody tr')).toHaveCount(13);
-    await expect(dayTable(page).locator('tbody th').first()).toHaveText('1. 8:00‐8:50');
+    await expect(periodRows(page)).toHaveCount(13);
+    await expect(dayTable(page).getByRole('rowheader').first()).toHaveText('1. 8:00‐8:50');
     expect(errors).toEqual([]);
   });
 
   test('empty periods are real rows', async ({ page }) => {
     await openApp(page);
     await page.getByRole('radio', { name: 'יום ראשון' }).click();
-    const rows = dayTable(page).locator('tbody tr');
-    await expect(rows.nth(12).locator('td')).toHaveText('שעה פנויה');
-    await expect(rows.nth(12).locator('th')).toHaveText('13. 18:25‐19:10');
+    const rows = periodRows(page);
+    await expect(rows.nth(12).getByRole('cell')).toHaveText('שעה פנויה');
+    await expect(rows.nth(12).getByRole('rowheader')).toHaveText('13. 18:25‐19:10');
   });
 
   test('swiping left or right never changes the day; only the day buttons do; vertical drags scroll', async ({ page }) => {

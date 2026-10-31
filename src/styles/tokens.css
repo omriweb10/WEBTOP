@@ -6,9 +6,12 @@
  * video scale 1.2736 px/pt); see docs/visual-spec.md for the method and notes.
  */
 :root {
-  /* Lesson cards (background tint ratios live in src/theme/lessonCardColors.ts) */
+  /* Lesson cards (background tint ratios live in src/theme/lessonCardColors.ts).
+     Measured from Webtop's timetable: 4px margin, padding and radius. */
   --card-accent-width: 4px;
-  --card-radius: 3px;
+  --card-radius: 4px;
+  --card-margin: 4px;
+  --card-padding: 4px;
 
   /* Typography */
   --font-family: 'Open Sans', 'Arial Hebrew', 'Noto Sans Hebrew', system-ui, -apple-system, sans-serif;
@@ -29,9 +32,13 @@
   --day-bar-height: 58px;
   --day-circle: 32px;
   --page-gutter: 16px;
-  --period-column: 92px;
-  --table-header-height: 45px;
-  --cell-padding: 4px;
+  /* Day timetable grid, measured from Webtop's DOM at a 393px viewport: 25% for the times
+     (right), 75% for the lessons (left); a 45px header; empty periods 34.5333px tall. */
+  --timetable-time-column: 25%;
+  --timetable-lesson-column: 75%;
+  --timetable-header-height: 45px;
+  --timetable-row-min: 34.5333px;
+  --timetable-header-padding: 8px 4px;
   --period-padding: 8px;
   --fab-size: 56px;
   --sidebar-width: min(80vw, 321px);

@@ -11,7 +11,7 @@ import { AssignedLessonEditor } from './AssignedLessonEditor';
 import { ChangeAlert } from './ChangeAlert';
 import { DaySelector } from './DaySelector';
 import { LessonEditor } from './LessonEditor';
-import { TimetableTable } from './TimetableTable';
+import { TimetableGrid } from './grid/TimetableGrid';
 import styles from './DayTimetableView.module.css';
 
 interface DayTimetableViewProps {
@@ -44,7 +44,7 @@ export function DayTimetableView({ spacedTable = false }: DayTimetableViewProps)
       <div ref={scrollRef} className={styles.scroll} data-testid="timetable-scroll">
         <ChangeAlert day={day} />
         <div className={cx(styles.tableWrap, spacedTable && styles.spaced)}>
-          <TimetableTable
+          <TimetableGrid
             key={day}
             timetable={timetable}
             day={day}

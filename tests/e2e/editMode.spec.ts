@@ -1,8 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
-import { dayTable, openApp, tableDayHeader, trackErrors, unlockEditMode } from './helpers';
+import { openApp, periodRows, tableDayHeader, trackErrors, unlockEditMode } from './helpers';
 
 /** Row (tr) of a period in the visible day table, 1-based. */
-const row = (page: Page, period: number) => dayTable(page).locator('tbody tr').nth(period - 1);
+const row = (page: Page, period: number) => periodRows(page).nth(period - 1);
 /** The lesson editor sheet. */
 const editor = (page: Page) => page.getByRole('dialog').filter({ has: page.getByRole('heading', { name: 'בחירת מקצוע מתבנית' }) });
 

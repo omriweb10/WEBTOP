@@ -3,7 +3,7 @@
  * layout (both themes), tap-only day changes, and editing shared with the main timetable.
  */
 import { expect, test, type Page } from '@playwright/test';
-import { dayTable, openApp, tableDayHeader, touchDrag, unlockEditMode } from './helpers';
+import { lessonCard, openApp, periodRows, tableDayHeader, touchDrag, unlockEditMode } from './helpers';
 
 const PROFILE = { studentName: 'נועה לוי', subtitle: 'עותק אישי', className: "י' 1" };
 const TOP_INSET = 62;
@@ -13,7 +13,7 @@ const IPHONE_INSETS = `:root:root { --safe-top: ${TOP_INSET}px; --safe-bottom: $
 /** Within half a pixel (collapsed table borders sit on half-pixel edges). */
 const near = (actual: number | undefined, expected: number) => expect(Math.abs((actual ?? Number.NaN) - expected)).toBeLessThanOrEqual(0.5);
 
-const row = (page: Page, period: number) => dayTable(page).locator('tbody tr').nth(period - 1);
+const row = (page: Page, period: number) => periodRows(page).nth(period - 1);
 const header = (page: Page) => page.getByRole('banner');
 
 /** Opens the Student Card timetable from the side menu, as a student would. */
@@ -42,7 +42,7 @@ test('side menu → כרטיס תלמיד → מערכת שעות, and the back 
 
   // The student's name and their timetable.
   await expect(page.getByRole('region', { name: 'שם התלמיד/ה' })).toContainText('נועה לוי');
-  await expect(dayTable(page).locator('tbody tr')).toHaveCount(13);
+  await expect(periodRows(page)).toHaveCount(13);
 
   // The menu marks the section as current.
   await bar.getByRole('button', { name: 'חזרה לכרטיס תלמיד' }).click();
@@ -80,7 +80,7 @@ async function measure(page: Page, theme: 'dark' | 'light') {
     const panel = document.querySelector('[aria-labelledby="student-name-label"]');
     const field = panel?.firstElementChild;
     const dayBar = document.querySelector('[role="radiogroup"][aria-label="בחירת יום"]');
-    const table = document.querySelector('table[aria-label^="מערכת שעות ליום"]');
+    const table = document.querySelector('[role="table"][aria-label^="מערכת שעות ליום"]');
     const scroll = document.querySelector('[data-testid="timetable-scroll"]');
     return {
       viewport: window.innerHeight,
@@ -88,8 +88,8 @@ async function measure(page: Page, theme: 'dark' | 'light') {
       panel: box(panel),
       underline: field ? field.getBoundingClientRect().bottom : null,
       dayBar: box(dayBar),
-      tableHeader: box(table?.querySelector('thead')),
-      firstRow: box(table?.querySelector('tbody tr')),
+      tableHeader: box(table?.querySelector('[role="row"]')),
+      firstRow: box(table?.querySelectorAll('[role="row"]')[1]),
       scroll: box(scroll),
       horizontalOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
     };
@@ -100,21 +100,21 @@ for (const theme of ['light', 'dark'] as const) {
   test(`${theme}: matches the measured layout, scrolls to the last row and leaves no empty band`, async ({ page }) => {
     const m = await measure(page, theme);
     // Header 55pt under the status-bar inset; name card 66pt with its divider at 57.5pt;
-    // 8pt gap; 58pt day bar; the table 10pt below it; header row 45pt; empty row 34pt + border.
+    // 8pt gap; 58pt day bar; the table 10pt below it; header row 45pt; empty row 34.5333pt.
     expect(m.header).toEqual({ top: TOP_INSET, bottom: TOP_INSET + 55 });
     expect(m.panel).toEqual({ top: TOP_INSET + 55, bottom: TOP_INSET + 121 });
     expect(m.underline).toBe(TOP_INSET + 55 + 58);
     expect(m.dayBar).toEqual({ top: TOP_INSET + 129, bottom: TOP_INSET + 187 });
     near(m.tableHeader?.top, TOP_INSET + 197);
     near(m.tableHeader?.bottom, TOP_INSET + 242);
-    // An empty period: 34pt plus its 1px border (the reference's row pitch is 34.6pt).
-    near((m.firstRow?.bottom ?? 0) - (m.firstRow?.top ?? 0), 35);
+    // An empty period: 34.5333px, as in Webtop (the reference screenshot's row pitch is 34.6pt).
+    near((m.firstRow?.bottom ?? 0) - (m.firstRow?.top ?? 0), 34.5333);
     // The timetable runs down to the home-indicator inset; nothing overflows sideways.
     expect(m.scroll?.bottom).toBe(m.viewport - BOTTOM_INSET);
     expect(m.horizontalOverflow).toBe(false);
 
     await page.getByTestId('timetable-scroll').evaluate((el) => el.scrollTo({ top: el.scrollHeight }));
-    const last = dayTable(page).locator('tbody tr').last();
+    const last = periodRows(page).last();
     await expect(last).toContainText('13.');
     const lastBox = await last.boundingBox();
     expect((lastBox?.y ?? 0) + (lastBox?.height ?? 0)).toBeLessThanOrEqual(m.viewport - BOTTOM_INSET);
@@ -146,14 +146,14 @@ test('only the day buttons change the day; swipes do nothing; empty periods are 
   await expect(tableDayHeader(page)).toHaveText('חמישי');
 
   // Period 13 is free on Thursday in the example data: a real, empty row.
-  await expect(row(page, 13).locator('td')).toHaveText('שעה פנויה');
-  await expect(row(page, 13).locator('td').getByRole('button')).toHaveCount(0);
+  await expect(row(page, 13).getByRole('cell')).toHaveText('שעה פנויה');
+  await expect(row(page, 13).getByRole('cell').getByRole('button')).toHaveCount(0);
 
   // Lesson cards keep their subject's colour edge, exactly as on the main timetable.
   await page.getByRole('radio', { name: 'יום שלישי', exact: true }).click();
-  const edgeHere = await row(page, 2).locator('td > div').first().evaluate((el) => getComputedStyle(el).borderInlineStartColor);
+  const edgeHere = await lessonCard(row(page, 2)).evaluate((el) => getComputedStyle(el).borderInlineStartColor);
   await page.goto('#/schedule/timetable');
-  const edgeMain = await row(page, 2).locator('td > div').first().evaluate((el) => getComputedStyle(el).borderInlineStartColor);
+  const edgeMain = await lessonCard(row(page, 2)).evaluate((el) => getComputedStyle(el).borderInlineStartColor);
   expect(edgeHere).toBe(edgeMain);
 });
 

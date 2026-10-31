@@ -1,6 +1,6 @@
 /** Students in account mode: access-code sign-in, the one-device rule, persistence, editing. */
 import { expect, test, type Browser, type Page } from '@playwright/test';
-import { adminClient, createStudent, createUserPreset, dayTable, signInStudent, sql, stackAvailable, unlockEditMode } from './helpers';
+import { adminClient, createStudent, createUserPreset, dayTable, lessonCard, periodRows, signInStudent, sql, stackAvailable, unlockEditMode } from './helpers';
 
 test.skip(!stackAvailable, 'needs the local stack (npm run stack)');
 
@@ -219,12 +219,12 @@ test('כרטיס תלמיד → מערכת שעות shows the student’s own na
   // Name and lessons from the student's own Supabase data; nothing of the other student.
   await expect(page.getByTestId('student-name')).toHaveText('שירה כהן');
   await page.getByRole('radio', { name: 'יום שלישי', exact: true }).click();
-  const rows = dayTable(page).locator('tbody tr');
-  await expect(rows.nth(0).locator('td')).toHaveText('שעה פנויה');
+  const rows = periodRows(page);
+  await expect(rows.nth(0).getByRole('cell')).toHaveText('שעה פנויה');
   await expect(rows.nth(1)).toContainText('מתמטיקה');
   await expect(rows.nth(1)).toContainText('דניאל');
   await expect(rows.nth(1)).toContainText('חדר: 101');
-  expect(await rows.nth(1).locator('td > div').first().evaluate((el) => getComputedStyle(el).borderInlineStartColor)).toBe('rgb(20, 152, 253)');
+  expect(await lessonCard(rows.nth(1)).evaluate((el) => getComputedStyle(el).borderInlineStartColor)).toBe('rgb(20, 152, 253)');
   await expect(page.locator('body')).not.toContainText('ספרות');
   await expect(page.locator('body')).not.toContainText('מורה של אחר');
 
@@ -242,6 +242,6 @@ test('כרטיס תלמיד → מערכת שעות shows the student’s own na
 
   await page.goto('#/schedule/timetable');
   await page.getByRole('radio', { name: 'יום שלישי', exact: true }).click();
-  await expect(dayTable(page).locator('tbody tr').nth(0)).toContainText('כימיה');
-  await expect(dayTable(page).locator('tbody tr').nth(1)).toContainText('מתמטיקה');
+  await expect(periodRows(page).nth(0)).toContainText('כימיה');
+  await expect(periodRows(page).nth(1)).toContainText('מתמטיקה');
 });
